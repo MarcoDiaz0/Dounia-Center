@@ -3,18 +3,19 @@ import Assessment from "../models/Assessment.model.js";
 import Session from "../models/Session.model.js";
 import Note from "../models/Note.model.js";
 import Program from "../models/Program.model.js";
+import User from "../models/User.model.js";
+import Notification from "../models/Notification.model.js";
 
 // ─────────────────────────────────────────
 // CHILDREN CRUD
 // ─────────────────────────────────────────
 
-// Get all children for parent
+// Get all children for parent or all children for admin
 export const getChildren = async (req, res) => {
   try {
-    const children = await Child.find({
-      parent: req.user.id,
-      isActive: true,
-    })
+    const query = req.user.role === "admin" ? { isActive: true } : { parent: req.user.id, isActive: true };
+    const children = await Child.find(query)
+      .populate("parent", "fullName email")
       .populate("enrolledPrograms")
       .populate("assessments")
       .populate("sessions")
@@ -37,10 +38,9 @@ export const getChildren = async (req, res) => {
 // Get child by ID
 export const getChildById = async (req, res) => {
   try {
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    })
+    const query = req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id };
+    const child = await Child.findOne(query)
+      .populate("parent", "fullName email")
       .populate("enrolledPrograms")
       .populate("assessments")
       .populate("sessions")
@@ -92,6 +92,18 @@ export const createChild = async (req, res) => {
       medicalNotes,
     });
 
+    // Notify admins
+    const admins = await User.find({ role: "admin" });
+    const notificationPromises = admins.map((admin) =>
+      Notification.create({
+        recipient: admin._id,
+        message: `تمت إضافة طفل جديد: ${firstName} ${lastName} من قبل ${req.user.fullName}`,
+        type: "child_added",
+        relatedId: child._id,
+      })
+    );
+    await Promise.all(notificationPromises);
+
     res.status(201).json({
       success: true,
       message: "Child profile created successfully",
@@ -141,7 +153,7 @@ export const updateChild = async (req, res) => {
       updateData.developmentalScores = developmentalScores;
 
     const child = await Child.findOneAndUpdate(
-      { _id: req.params.id, parent: req.user.id },
+      (req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }),
       updateData,
       { new: true, runValidators: true },
     )
@@ -175,7 +187,7 @@ export const updateChild = async (req, res) => {
 export const deleteChild = async (req, res) => {
   try {
     const child = await Child.findOneAndUpdate(
-      { _id: req.params.id, parent: req.user.id },
+      (req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }),
       { isActive: false },
       { new: true },
     );
@@ -205,10 +217,9 @@ export const addMilestone = async (req, res) => {
   try {
     const { title, category, achievedAt, notes } = req.body;
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -257,10 +268,9 @@ export const enrollProgram = async (req, res) => {
       });
     }
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -297,10 +307,9 @@ export const enrollProgram = async (req, res) => {
 // Unenroll child from a program
 export const unenrollProgram = async (req, res) => {
   try {
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -337,10 +346,9 @@ export const addAssessment = async (req, res) => {
   try {
     const { date, type, results } = req.body;
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -376,10 +384,9 @@ export const addAssessment = async (req, res) => {
 // Delete assessment
 export const deleteAssessment = async (req, res) => {
   try {
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -417,10 +424,9 @@ export const addSession = async (req, res) => {
   try {
     const { date, time, type, status } = req.body;
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -459,10 +465,9 @@ export const updateSessionStatus = async (req, res) => {
   try {
     const { status } = req.body;
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -501,10 +506,9 @@ export const updateSessionStatus = async (req, res) => {
 // Delete session
 export const deleteSession = async (req, res) => {
   try {
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -542,10 +546,9 @@ export const addNote = async (req, res) => {
   try {
     const { content, date } = req.body;
 
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({
@@ -580,10 +583,9 @@ export const addNote = async (req, res) => {
 // Delete note
 export const deleteNote = async (req, res) => {
   try {
-    const child = await Child.findOne({
-      _id: req.params.id,
-      parent: req.user.id,
-    });
+    const child = await Child.findOne(
+      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+    );
 
     if (!child) {
       return res.status(404).json({

@@ -10,6 +10,7 @@ import userRoutes from "./routes/user.routes.js";
 import childRoutes from "./routes/child.routes.js";
 import assessmentRoutes from "./routes/assessment.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/children", childRoutes);
 app.use("/api/assessments", assessmentRoutes);
 app.use("/api/resources", resourceRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 /* ─────────────────────────────────────────────────────────────
    HEALTH CHECK

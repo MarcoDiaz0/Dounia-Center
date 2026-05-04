@@ -60,32 +60,6 @@ export default function SignupForm() {
         </div>
       )}
 
-      {/* ROLE */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => setFormData({ ...formData, role: "parent" })}
-          className={`p-4 rounded-xl border-2 text-center ${
-            formData.role === "parent"
-              ? "border-primary-500 bg-primary-50"
-              : "border-secondary-200"
-          }`}
-        >
-          ولي أمر
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setFormData({ ...formData, role: "specialist" })}
-          className={`p-4 rounded-xl border-2 text-center ${
-            formData.role === "specialist"
-              ? "border-primary-500 bg-primary-50"
-              : "border-secondary-200"
-          }`}
-        >
-          مختص
-        </button>
-      </div>
 
       {/* FULL NAME */}
       <div className="relative">

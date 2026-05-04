@@ -20,6 +20,7 @@ import Card, {
 import Button from "@/components/common/Button";
 import { useAuthStore } from "@/store/authStore";
 import { useChildStore } from "@/store/childStore";
+import { useNotificationStore } from "@/store/notificationStore";
 import { useEffect } from "react";
 
 const quickStats = [
@@ -53,26 +54,7 @@ const quickStats = [
   },
 ];
 
-const recentNotifications = [
-  {
-    id: 1,
-    type: "session",
-    message: "لديك جلسة مع الأخصائي أحمد غداً الساعة 10:00",
-    time: "منذ ساعة",
-  },
-  {
-    id: 2,
-    type: "progress",
-    message: "تم تحديث تقرير تقدم يوسف",
-    time: "منذ 3 ساعات",
-  },
-  {
-    id: 3,
-    type: "reminder",
-    message: "لا تنسَ إكمال تمارين هذا الأسبوع",
-    time: "منذ يوم",
-  },
-];
+
 
 const upcomingSessions = [
   {
@@ -96,8 +78,11 @@ const upcomingSessions = [
 export default function Dashboard() {
   const { user } = useAuthStore();
   const { children, getChildren } = useChildStore();
+  const { notifications, getNotifications } = useNotificationStore();
+
   useEffect(() => {
     getChildren();
+    getNotifications();
   }, []);
   return (
     <div className="space-y-6">
@@ -180,8 +165,13 @@ export default function Dashboard() {
                         <p className="font-medium text-primary-800">
                           {child.fullName}
                         </p>
-                        <p className="text-sm text-primary-600">
-                          {child.age.years} سنوات
+                        <p className="text-sm text-primary-600 flex items-center gap-2">
+                          <span>{child.age?.years} سنوات</span>
+                          {user?.role === "admin" && child.parent?.fullName && (
+                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                              ولي الأمر: {child.parent.fullName}
+                            </span>
+                          )}
                         </p>
                       </div>
                       <div className="text-left">
@@ -218,38 +208,47 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentNotifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  className="flex gap-3 pb-4 border-b border-secondary-100 last:border-0 last:pb-0"
-                >
+              {notifications.length === 0 ? (
+                <p className="text-sm text-primary-500 text-center py-4">
+                  لا توجد إشعارات جديدة
+                </p>
+              ) : (
+                notifications.slice(0, 5).map((notif) => (
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                      notif.type === "session"
-                        ? "bg-blue-100 text-blue-600"
-                        : notif.type === "progress"
-                          ? "bg-primary-100 text-primary-600"
-                          : "bg-amber-100 text-amber-600"
-                    }`}
+                    key={notif._id}
+                    className={`flex gap-3 pb-4 border-b border-secondary-100 last:border-0 last:pb-0 ${notif.isRead ? "opacity-60" : ""}`}
                   >
-                    {notif.type === "session" ? (
-                      <Calendar className="w-4 h-4" />
-                    ) : notif.type === "progress" ? (
-                      <TrendingUp className="w-4 h-4" />
-                    ) : (
-                      <Bell className="w-4 h-4" />
-                    )}
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                        notif.type === "child_added"
+                          ? "bg-primary-100 text-primary-600"
+                          : notif.type === "session"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-amber-100 text-amber-600"
+                      }`}
+                    >
+                      {notif.type === "child_added" ? (
+                        <Users className="w-4 h-4" />
+                      ) : notif.type === "session" ? (
+                        <Calendar className="w-4 h-4" />
+                      ) : (
+                        <Bell className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-primary-700 line-clamp-2">
+                        {notif.message}
+                      </p>
+                      <p className="text-xs text-primary-500 mt-1">
+                        {new Date(notif.createdAt).toLocaleDateString("ar-EG", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-primary-700 line-clamp-2">
-                      {notif.message}
-                    </p>
-                    <p className="text-xs text-primary-500 mt-1">
-                      {notif.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
