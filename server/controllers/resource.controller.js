@@ -1,4 +1,5 @@
 import Resource from '../models/Resource.model.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 // Get all resources
 export const getResources = async (req, res) => {
@@ -149,7 +150,7 @@ export const getResourcesByCategory = async (req, res) => {
   }
 };
 
-// Create resource (admin/specialist only)
+// Create resource (admin only)
 export const createResource = async (req, res) => {
   try {
     const resourceData = {
@@ -180,21 +181,29 @@ export const createResource = async (req, res) => {
   }
 };
 
-// Update resource (admin/specialist only)
+// Update resource (admin only)
 export const updateResource = async (req, res) => {
   try {
-    const resource = await Resource.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!resource) {
+    const oldResource = await Resource.findById(req.params.id);
+    
+    if (!oldResource) {
       return res.status(404).json({
         success: false,
         message: 'Resource not found'
       });
     }
+
+    // If new media is provided, delete the old one from Cloudinary
+    if (req.body.mediaPublicId && oldResource.mediaPublicId && req.body.mediaPublicId !== oldResource.mediaPublicId) {
+      const resourceType = oldResource.type === 'pdfs' || oldResource.mediaUrl?.endsWith('.pdf') ? 'raw' : 'image';
+      await cloudinary.uploader.destroy(oldResource.mediaPublicId, { resource_type: resourceType });
+    }
+
+    const resource = await Resource.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
 
     res.json({
       success: true,
@@ -213,7 +222,7 @@ export const updateResource = async (req, res) => {
 // Delete resource (admin only)
 export const deleteResource = async (req, res) => {
   try {
-    const resource = await Resource.findByIdAndDelete(req.params.id);
+    const resource = await Resource.findById(req.params.id);
 
     if (!resource) {
       return res.status(404).json({
@@ -221,6 +230,15 @@ export const deleteResource = async (req, res) => {
         message: 'Resource not found'
       });
     }
+
+    // Delete from Cloudinary if exists
+    if (resource.mediaPublicId) {
+      // Determine resource type (raw for pdfs, image for images)
+      const resourceType = resource.type === 'pdfs' || resource.mediaUrl?.endsWith('.pdf') ? 'raw' : 'image';
+      await cloudinary.uploader.destroy(resource.mediaPublicId, { resource_type: resourceType });
+    }
+
+    await Resource.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,

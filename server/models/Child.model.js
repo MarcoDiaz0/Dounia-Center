@@ -83,12 +83,6 @@ const childSchema = new mongoose.Schema(
         ref: "Assessment",
       },
     ],
-    sessions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Session",
-      },
-    ],
     notes: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,10 +1,11 @@
 import Child from "../models/Child.model.js";
 import Assessment from "../models/Assessment.model.js";
-import Session from "../models/Session.model.js";
 import Note from "../models/Note.model.js";
 import Program from "../models/Program.model.js";
 import User from "../models/User.model.js";
 import Notification from "../models/Notification.model.js";
+
+// ─────────────────────────────────────────
 
 // ─────────────────────────────────────────
 // CHILDREN CRUD
@@ -18,7 +19,6 @@ export const getChildren = async (req, res) => {
       .populate("parent", "fullName email")
       .populate("enrolledPrograms")
       .populate("assessments")
-      .populate("sessions")
       .populate("notes")
       .sort({ createdAt: -1 });
 
@@ -43,7 +43,6 @@ export const getChildById = async (req, res) => {
       .populate("parent", "fullName email")
       .populate("enrolledPrograms")
       .populate("assessments")
-      .populate("sessions")
       .populate("notes");
 
     if (!child) {
@@ -159,7 +158,6 @@ export const updateChild = async (req, res) => {
     )
       .populate("enrolledPrograms")
       .populate("assessments")
-      .populate("sessions")
       .populate("notes");
 
     if (!child) {
@@ -416,126 +414,6 @@ export const deleteAssessment = async (req, res) => {
 };
 
 // ─────────────────────────────────────────
-// SESSIONS
-// ─────────────────────────────────────────
-
-// Add session
-export const addSession = async (req, res) => {
-  try {
-    const { date, time, type, status } = req.body;
-
-    const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
-    );
-
-    if (!child) {
-      return res.status(404).json({
-        success: false,
-        message: "Child not found",
-      });
-    }
-
-    const session = await Session.create({
-      child: child._id,
-      date,
-      time,
-      type,
-      status,
-    });
-
-    child.sessions.push(session._id);
-    await child.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Session added successfully",
-      data: { session },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to add session",
-      error: error.message,
-    });
-  }
-};
-
-// Update session status
-export const updateSessionStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-
-    const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
-    );
-
-    if (!child) {
-      return res.status(404).json({
-        success: false,
-        message: "Child not found",
-      });
-    }
-
-    const session = await Session.findByIdAndUpdate(
-      req.params.sessionId,
-      { status },
-      { new: true, runValidators: true },
-    );
-
-    if (!session) {
-      return res.status(404).json({
-        success: false,
-        message: "Session not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Session status updated successfully",
-      data: { session },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update session",
-      error: error.message,
-    });
-  }
-};
-
-// Delete session
-export const deleteSession = async (req, res) => {
-  try {
-    const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
-    );
-
-    if (!child) {
-      return res.status(404).json({
-        success: false,
-        message: "Child not found",
-      });
-    }
-
-    await Session.findByIdAndDelete(req.params.sessionId);
-
-    child.sessions = child.sessions.filter(
-      (s) => s.toString() !== req.params.sessionId,
-    );
-    await child.save();
-
-    res.json({
-      success: true,
-      message: "Session deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete session",
-      error: error.message,
-    });
-  }
-};
 
 // ─────────────────────────────────────────
 // NOTES

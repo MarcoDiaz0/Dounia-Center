@@ -40,15 +40,11 @@ export default function DashboardNotifications() {
                 className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
                   notif.type === "child_added"
                     ? "bg-primary-100 text-primary-600"
-                    : notif.type === "session"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-amber-100 text-amber-600"
+                    : "bg-amber-100 text-amber-600"
                 }`}
               >
                 {notif.type === "child_added" ? (
                   <Users className="w-5 h-5" />
-                ) : notif.type === "session" ? (
-                  <Calendar className="w-5 h-5" />
                 ) : (
                   <Bell className="w-5 h-5" />
                 )}

@@ -11,10 +11,10 @@ import {
   Settings,
   LogOut,
   Menu,
-  X,
   ChevronLeft,
   BookOpen,
   TrendingUp,
+  X,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import Button from '../common/Button'
@@ -24,7 +24,6 @@ const sidebarLinks = [
   { name: 'نتائج التقييم', href: '/dashboard/assessments', icon: ClipboardList },
   { name: 'ملفات الأطفال', href: '/dashboard/children', icon: Users },
   { name: 'البرامج المسجلة', href: '/dashboard/programs', icon: BookOpen },
-  { name: 'الجلسات القادمة', href: '/dashboard/sessions', icon: Calendar },
   { name: 'التقدم', href: '/dashboard/progress', icon: TrendingUp },
   { name: 'الإشعارات', href: '/dashboard/notifications', icon: Bell },
   { name: 'الإعدادات', href: '/dashboard/settings', icon: Settings },

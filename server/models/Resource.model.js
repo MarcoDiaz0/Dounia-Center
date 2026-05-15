@@ -35,6 +35,10 @@ const resourceSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  mediaPublicId: {
+    type: String,
+    default: null
+  },
   duration: {
     type: Number, // in minutes
     default: null

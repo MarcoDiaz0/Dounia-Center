@@ -22,9 +22,9 @@ router.get('/:id', getResourceById);
 // Protected routes
 router.post('/:id/like', optionalAuth, likeResource);
 
-// Admin/Specialist only routes
-router.post('/', protect, authorize('admin', 'specialist'), createResource);
-router.put('/:id', protect, authorize('admin', 'specialist'), updateResource);
+// Admin only routes
+router.post('/', protect, authorize('admin'), createResource);
+router.put('/:id', protect, authorize('admin'), updateResource);
 router.delete('/:id', protect, authorize('admin'), deleteResource);
 
 export default router;

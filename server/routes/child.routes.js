@@ -12,10 +12,6 @@ import {
   // Assessments
   addAssessment,
   deleteAssessment,
-  // Sessions
-  addSession,
-  updateSessionStatus,
-  deleteSession,
   // Notes
   addNote,
   deleteNote,
@@ -25,6 +21,7 @@ import { protect } from "../middleware/auth.middleware.js";
 const router = Router();
 
 router.use(protect);
+
 
 // ─── Children ───────────────────────────
 router.get("/", getChildren);
@@ -44,10 +41,6 @@ router.delete("/:id/programs/:programId", unenrollProgram);
 router.post("/:id/assessments", addAssessment);
 router.delete("/:id/assessments/:assessmentId", deleteAssessment);
 
-// ─── Sessions ────────────────────────────
-router.post("/:id/sessions", addSession);
-router.patch("/:id/sessions/:sessionId", updateSessionStatus);
-router.delete("/:id/sessions/:sessionId", deleteSession);
 
 // ─── Notes ───────────────────────────────
 router.post("/:id/notes", addNote);

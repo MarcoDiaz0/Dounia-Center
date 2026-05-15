@@ -22,7 +22,6 @@ import ChildProfile from "@/pages/ChildProfile";
 import DashboardAssessments from "./dashboard/DashboardAssessments";
 import DashboardChildren from "./dashboard/DashboardChildren";
 import DashboardPrograms from "./dashboard/DashboardPrograms";
-import DashboardSessions from "./dashboard/DashboardSessions";
 import DashboardProgress from "./dashboard/DashboardProgress";
 import DashboardNotifications from "./dashboard/DashboardNotifications";
 import DashboardSettings from "./dashboard/DashboardSettings";
@@ -93,7 +92,6 @@ export default function AppRouter() {
         <Route path="children" element={<DashboardChildren />} />
         <Route path="children/:id" element={<ChildProfile />} />
         <Route path="programs" element={<DashboardPrograms />} />
-        <Route path="sessions" element={<DashboardSessions />} />
         <Route path="progress" element={<DashboardProgress />} />
         <Route path="notifications" element={<DashboardNotifications />} />
         <Route path="settings" element={<DashboardSettings />} />
