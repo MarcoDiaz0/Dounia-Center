@@ -5,7 +5,7 @@ import SignupForm from '@/components/auth/SignupForm'
 const benefits = [
   'تقييم مجاني لاحتياجات طفلك',
   'ملف رقمي شخصي لمتابعة التقدم',
-  'حجز جلسات أونلاين بسهولة',
+  'متابعة تقدم طفلك بسهولة',
   'الوصول إلى مكتبة الموارد التعليمية',
   'تقارير تقدم دورية',
 ]
@@ -46,7 +46,7 @@ export default function Signup() {
           </div>
           <h2 className="text-3xl font-bold mb-4">ابدأ رحلة طفلك معنا</h2>
           <p className="text-primary-100 leading-relaxed mb-8">
-            أنشئ حسابك الآن للاستفادة من خدماتنا المتخصصة في الدعم النفسي والتربوي.
+            أنشئ حسابك الآن للاستفادة من خدماتنا التربوية والإرشادية.
           </p>
 
           <ul className="space-y-4">

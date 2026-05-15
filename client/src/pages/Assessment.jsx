@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   ClipboardCheck,
   ArrowLeft,
@@ -67,35 +68,41 @@ export default function Assessment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const child = await createChild(form);
-    if (result) {
-      const toPercent = (score, max) => Math.round(((max - score) / max) * 100);
+    try {
+      const child = await createChild(form);
+      if (result) {
+        const toPercent = (score, max) => Math.round(((max - score) / max) * 100);
 
-      await addAssessment(child._id, {
-        type: "initial",
-        date: new Date().toISOString().split("T")[0],
-        results: {
-          attention: toPercent(
-            result.categories.attention.score,
-            result.categories.attention.max,
-          ),
-          reading: toPercent(
-            result.categories.reading.score,
-            result.categories.reading.max,
-          ),
-          behavior: toPercent(
-            result.categories.behavior.score,
-            result.categories.behavior.max,
-          ),
-          writing: toPercent(
-            result.categories.writing.score,
-            result.categories.writing.max,
-          ),
-        },
-      });
+        await addAssessment(child._id, {
+          type: "initial",
+          date: new Date().toISOString().split("T")[0],
+          results: {
+            attention: toPercent(
+              result.categories.attention.score,
+              result.categories.attention.max,
+            ),
+            reading: toPercent(
+              result.categories.reading.score,
+              result.categories.reading.max,
+            ),
+            behavior: toPercent(
+              result.categories.behavior.score,
+              result.categories.behavior.max,
+            ),
+            writing: toPercent(
+              result.categories.writing.score,
+              result.categories.writing.max,
+            ),
+          },
+        });
+      }
+      toast.success("تم إنشاء ملف الطفل وحفظ النتائج بنجاح");
+      resetAssessment();
+      navigate("/dashboard");
+    } catch (err) {
+      toast.error("فشل حفظ ملف الطفل");
+      console.error(err);
     }
-    resetAssessment();
-    navigate("/dashboard");
   };
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;

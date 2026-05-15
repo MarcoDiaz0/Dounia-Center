@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Button from "../common/Button";
 import { useAuthStore } from "@/store/authStore";
@@ -20,15 +21,16 @@ export default function LoginForm() {
     setError("");
 
     try {
-      
       await login({
         email,
         password,
       });
-
+      toast.success("مرحباً بك مجدداً!");
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.data?.message || err?.message || "فشل تسجيل الدخول");
+      const message = err?.response?.data?.message || err?.message || "فشل تسجيل الدخول";
+      setError(message);
+      toast.error(message);
     }
   };
 

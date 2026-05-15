@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { X, Upload, FileText, CheckCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 import Button from '../common/Button'
 import resourceService from '@/services/resourceService'
 
@@ -41,11 +42,13 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
         mediaUrl: data.data.url,
         mediaPublicId: data.data.public_id,
       })
+      toast.success('تم رفع الملف بنجاح')
       setUploading(false)
       setError(null)
     } catch (err) {
       setUploading(false)
       setError('فشل رفع الملف')
+      toast.error('فشل رفع الملف')
       console.error(err)
     }
   }
@@ -66,6 +69,7 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
 
       await resourceService.createResource(payload)
       setSuccess(true)
+      toast.success('تمت إضافة المصدر بنجاح')
       setTimeout(() => {
         onRefresh()
         onClose()
@@ -78,6 +82,7 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
       }, 1500)
     } catch (err) {
       setError('فشل إضافة المصدر')
+      toast.error('فشل إضافة المصدر')
       console.error(err)
     } finally {
       setLoading(false)

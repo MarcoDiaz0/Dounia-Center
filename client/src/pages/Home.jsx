@@ -24,7 +24,7 @@ const services = [
   {
     icon: Heart,
     title: "الدعم النفسي والإرشاد",
-    description: "جلسات نفسية متخصصة للأطفال والعائلات مع أخصائيين معتمدين",
+    description: "جلسات تعليمية وتربوية شاملة للأطفال والعائلات",
     color: "bg-rose-100 text-rose-600",
   },
   {
@@ -36,7 +36,7 @@ const services = [
   {
     icon: BookOpen,
     title: "تحسين القراءة والكتابة",
-    description: "تدريب متخصص لتطوير مهارات القراءة والكتابة",
+    description: "تدريب مكثف لتطوير مهارات القراءة والكتابة",
     color: "bg-blue-100 text-blue-600",
   },
   {
@@ -57,7 +57,7 @@ const journeySteps = [
   {
     step: 2,
     title: "التشخيص",
-    description: "تحليل دقيق للنتائج مع الأخصائيين",
+    description: "تحليل دقيق للنتائج وتحديد الاحتياجات",
   },
   { step: 3, title: "البرنامج المخصص", description: "وضع خطة علاجية مناسبة" },
   { step: 4, title: "المتابعة", description: "جلسات منتظمة ومتابعة مستمرة" },
@@ -97,8 +97,8 @@ const testimonials = [
 const features = [
   {
     icon: Shield,
-    title: "فريق متخصص",
-    description: "أخصائيون نفسيون وتربويون معتمدون",
+    title: "برامج تعليمية",
+    description: "خطط تعليمية وتربوية مدروسة بعناية",
   },
   {
     icon: Sparkles,
@@ -132,7 +132,7 @@ export default function Home() {
             <div className="text-center lg:text-right animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-medium mb-6">
                 <Sparkles className="w-4 h-4" />
-                <span>مركز متخصص في الدعم النفسي والتربوي</span>
+                <span>مركز متكامل في الدعم النفسي والتربوي</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-900 leading-tight mb-6">
@@ -143,8 +143,8 @@ export default function Home() {
               </h1>
 
               <p className="text-xl text-primary-700 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                نرافقكم نحو نمو نفسي وتعليمي متوازن. نقدم خدمات متخصصة للأطفال
-                والعائلات بأيدي خبراء معتمدين.
+                نرافقكم نحو نمو نفسي وتعليمي متوازن. نقدم خدمات شاملة للأطفال
+                والعائلات من خلال برامج تعليمية مدروسة.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -172,8 +172,8 @@ export default function Home() {
                   <p className="text-sm text-primary-700">عائلة سعيدة</p>
                 </div>
                 <div className="text-center lg:text-right">
-                  <p className="text-3xl font-bold text-primary-600">+20</p>
-                  <p className="text-sm text-primary-700">أخصائي معتمد</p>
+                  <p className="text-3xl font-bold text-primary-600">+15</p>
+                  <p className="text-sm text-primary-700">برنامج تعليمي</p>
                 </div>
                 <div className="text-center lg:text-right">
                   <p className="text-3xl font-bold text-primary-600">+5</p>
@@ -184,10 +184,10 @@ export default function Home() {
 
             {/* Hero Illustration */}
             <div className="relative animate-slide-up animate-delay-200 hidden lg:block">
-              <div className="relative w-full aspect-square max-w-lg mx-auto">
+              <div className="relative w-full aspect-square max-w-lg mx-auto flex items-center justify-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-3xl rotate-6 opacity-20" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-3xl -rotate-3" />
-                <div className="relative bg-white rounded-3xl shadow-card p-8 flex items-center justify-center">
+                <div className="relative bg-white rounded-3xl shadow-card p-12 flex items-center justify-center z-10">
                   <div className="text-center">
                     <div className="w-32 h-32 mx-auto bg-primary-100 rounded-full flex items-center justify-center mb-6">
                       <Heart className="w-16 h-16 text-primary-500" />
@@ -213,9 +213,9 @@ export default function Home() {
                 <div className="aspect-[4/3] bg-secondary-100 rounded-3xl overflow-hidden">
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-100">
                     <div className="text-center p-8">
-                      <Users className="w-24 h-24 text-primary-400 mx-auto mb-4" />
+                      <BookOpen className="w-24 h-24 text-primary-400 mx-auto mb-4" />
                       <p className="text-primary-600 font-medium">
-                        فريق من الخبراء المتخصصين
+                        برامج تعليمية وتربوية مدروسة
                       </p>
                     </div>
                   </div>
@@ -237,17 +237,17 @@ export default function Home() {
             <div className="order-1 lg:order-2">
               <SectionTitle
                 title="من نحن"
-                subtitle="مركز متخصص في تقديم الدعم النفسي والتربوي للأطفال والعائلات"
+                subtitle="مركز متكامل في تقديم الدعم النفسي والتربوي للأطفال والعائلات"
                 align="right"
               />
               <div className="space-y-4 text-primary-700 leading-relaxed">
                 <p>
-                  مركز دنيا للنمو الداخلي والتعلم هو مؤسسة متخصصة تقدم خدمات
+                  مركز دنيا للنمو الداخلي والتعلم هو مؤسسة رائدة تقدم خدمات
                   نفسية وتربوية عالية الجودة للأطفال والعائلات في الجزائر.
                 </p>
                 <p>
                   نؤمن بأن كل طفل فريد من نوعه ويستحق الدعم المناسب لتحقيق
-                  إمكاناته الكاملة. فريقنا من الأخصائيين المعتمدين يعمل جنباً
+                  إمكاناته الكاملة. يعمل مركزنا جنباً
                   إلى جنب مع العائلات لتوفير بيئة داعمة ومحفزة.
                 </p>
                 <p>
@@ -273,7 +273,7 @@ export default function Home() {
         <div className="container-custom">
           <SectionTitle
             title="خدماتنا"
-            subtitle="نقدم مجموعة متكاملة من الخدمات المتخصصة لدعم نمو طفلك"
+            subtitle="نقدم مجموعة متكاملة من الخدمات التربوية لدعم نمو طفلك"
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -441,7 +441,7 @@ export default function Home() {
                   دعم تلاميذ الباكالوريا
                 </h3>
                 <p className="text-primary-100">
-                  دعم نفسي وأكاديمي متخصص لتلاميذ البكالوريا
+                  دعم نفسي وأكاديمي شامل لتلاميذ البكالوريا
                 </p>
               </div>
             </div>

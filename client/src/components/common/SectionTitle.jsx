@@ -7,9 +7,9 @@ export default function SectionTitle({
   className = '',
 }) {
   const alignStyles = {
-    left: 'text-right',
+    left: 'text-left',
     center: 'text-center',
-    right: 'text-left',
+    right: 'text-right',
   }
 
   return (
@@ -26,7 +26,7 @@ export default function SectionTitle({
         'mt-6 h-1 w-20 bg-gradient-to-l from-primary-400 to-primary-600 rounded-full',
         align === 'center' && 'mx-auto',
         align === 'left' && 'mr-auto',
-        align === 'right' && 'ml-auto'
+        align === 'right' && 'ml-0'
       )} />
     </div>
   )

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   ArrowRight,
   Calendar,
@@ -57,6 +58,7 @@ const skillIcons = {
 
 export default function ChildProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // ✅ ALL hooks at the top — before any return
   const {
@@ -136,12 +138,25 @@ export default function ChildProfile() {
 
   const handleAddNote = async () => {
     if (newNote.trim()) {
-      await addNote(child._id, { content: newNote });
-      setNewNote("");
+      try {
+        await addNote(child._id, { content: newNote });
+        setNewNote("");
+        toast.success("تمت إضافة الملاحظة");
+      } catch (err) {
+        toast.error("فشل إضافة الملاحظة");
+      }
     }
   };
-  const dltChild = () => {
-    deleteChild(child._id);
+  const dltChild = async () => {
+    if (window.confirm("هل أنت متأكد من حذف ملف هذا الطفل نهائياً؟")) {
+      try {
+        await deleteChild(child._id);
+        toast.success("تم حذف ملف الطفل");
+        navigate("/dashboard/children");
+      } catch (err) {
+        toast.error("فشل حذف ملف الطفل");
+      }
+    }
   };
   const handleAddAssessment = async () => {
     const result = calculateResult();
@@ -173,7 +188,12 @@ export default function ChildProfile() {
     setShowAssessmentForm(false);
   };
   const handleDeleteNote = async (noteId) => {
-    await deleteNote(child._id, noteId);
+    try {
+      await deleteNote(child._id, noteId);
+      toast.success("تم حذف الملاحظة");
+    } catch (err) {
+      toast.error("فشل حذف الملاحظة");
+    }
   };
   return (
     <div className="space-y-6">

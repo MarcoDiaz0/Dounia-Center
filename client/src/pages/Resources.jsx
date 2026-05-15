@@ -11,7 +11,9 @@ import {
   Filter,
   X,
   Plus,
+  Trash2,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import Card, { CardContent } from '@/components/common/Card'
 import SectionTitle from '@/components/common/SectionTitle'
 import Button from '@/components/common/Button'
@@ -98,6 +100,19 @@ export default function Resources() {
     const title = resource.title?.ar || resource.title?.en || resource.title
     const description = resource.description?.ar || resource.description?.en || resource.description
 
+    const handleDelete = async (id) => {
+      if (window.confirm('هل أنت متأكد من حذف هذا المصدر؟ سيتم حذفه من القاعدة ومن كلاوديناري أيضاً.')) {
+        try {
+          await resourceService.deleteResource(id)
+          fetchResources()
+          toast.success('تم حذف المصدر بنجاح')
+        } catch (err) {
+          toast.error('فشل حذف المصدر')
+          console.error(err)
+        }
+      }
+    }
+
     return (
       <Card hover className="h-full flex flex-col">
         <CardContent className="flex flex-col h-full">
@@ -109,7 +124,21 @@ export default function Resources() {
               <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${colorClass} mb-2`}>
                 {categories.find((c) => c.id === resource.type)?.name || resource.type}
               </span>
-              <h3 className="font-semibold text-primary-800 line-clamp-2">{title}</h3>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-semibold text-primary-800 line-clamp-2">{title}</h3>
+                {isAdmin && (
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(resource._id)
+                    }}
+                    className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="حذف"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { User, Mail, Lock, Eye, EyeOff, Phone, ArrowLeft } from "lucide-react";
 import Button from "../common/Button";
 import { useAuthStore } from "@/store/authStore";
@@ -29,7 +30,9 @@ export default function SignupForm() {
     setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError("كلمات المرور غير متطابقة");
+      const msg = "كلمات المرور غير متطابقة";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -44,9 +47,12 @@ export default function SignupForm() {
         role: formData.role,
       });
 
+      toast.success("تم إنشاء حسابك بنجاح! مرحباً بك.");
       navigate("/dashboard");
     } catch (err) {
-      setError(err);
+      const msg = err?.response?.data?.message || err?.message || "فشل إنشاء الحساب";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
