@@ -31,9 +31,6 @@ export default function DashboardSettings() {
     baridimob_rip: "",
     baridimob_name: "",
     redotpay_id: "",
-    ccp_number: "",
-    ccp_key: "",
-    ccp_name: "",
   });
 
   // Fetch settings on mount or when tab changes to system
@@ -45,9 +42,6 @@ export default function DashboardSettings() {
           baridimob_rip: settings.baridimob_rip || "",
           baridimob_name: settings.baridimob_name || "",
           redotpay_id: settings.redotpay_id || "",
-          ccp_number: settings.ccp_number || "",
-          ccp_key: settings.ccp_key || "",
-          ccp_name: settings.ccp_name || "",
         });
       } catch (error) {
         console.error("Failed to load settings", error);
@@ -428,57 +422,6 @@ export default function DashboardSettings() {
                   placeholder="ID Account"
                   dir="ltr"
                 />
-              </div>
-            </div>
-
-            {/* CCP DETAILS */}
-            <div className="bg-secondary-50 p-6 rounded-2xl border border-secondary-100 space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-secondary-200">
-                <CreditCard className="w-5 h-5 text-primary-600" />
-                <h3 className="font-bold text-primary-800">حساب الحساب البريدي الجاري CCP</h3>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-primary-700 mb-2">
-                    رقم الحساب CCP
-                  </label>
-                  <input
-                    type="text"
-                    value={systemSettings.ccp_number}
-                    onChange={(e) => setSystemSettings({ ...systemSettings, ccp_number: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-right text-sm text-primary-800"
-                    placeholder="رقم الحساب"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-primary-700 mb-2">
-                    المفتاح Key
-                  </label>
-                  <input
-                    type="text"
-                    value={systemSettings.ccp_key}
-                    onChange={(e) => setSystemSettings({ ...systemSettings, ccp_key: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-center text-sm text-primary-800"
-                    placeholder="XX"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-primary-700 mb-2">
-                    اسم صاحب حساب CCP
-                  </label>
-                  <input
-                    type="text"
-                    value={systemSettings.ccp_name}
-                    onChange={(e) => setSystemSettings({ ...systemSettings, ccp_name: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-sm text-primary-800"
-                    placeholder="الاسم الكامل"
-                  />
-                </div>
               </div>
             </div>
 

@@ -32,10 +32,8 @@ export default function DashboardLayout() {
     { name: 'ملفات الأطفال', href: '/dashboard/children', icon: Users },
     ...(user?.role === 'admin'
       ? [{ name: 'طلبات الاشتراك', href: '/dashboard/subscriptions', icon: CreditCard }]
-      : []
+      : [{ name: 'البرامج المسجلة', href: '/dashboard/programs', icon: BookOpen }]
     ),
-    { name: 'البرامج المسجلة', href: '/dashboard/programs', icon: BookOpen },
-    { name: 'التقدم', href: '/dashboard/progress', icon: TrendingUp },
     { name: 'الإشعارات', href: '/dashboard/notifications', icon: Bell },
     { name: 'الإعدادات', href: '/dashboard/settings', icon: Settings },
   ]

@@ -287,64 +287,66 @@ export default function Dashboard() {
 
 
       {/* Enrolled Programs */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>البرامج المسجلة</CardTitle>
-          <Link
-            to="/dashboard/programs"
-            className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
-          >
-            عرض الكل
-            <ChevronLeft className="w-4 h-4" />
-          </Link>
-        </CardHeader>
-        <CardContent>
-          {enrolledPrograms.length === 0 ? (
-            <p className="text-sm text-primary-500 text-center py-6">
-              لا توجد برامج مسجلة
-            </p>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {enrolledPrograms.slice(0, 6).map((program, index) => {
-                const colors = PROGRAM_COLORS[index % PROGRAM_COLORS.length];
-                return (
-                  <div key={`${program._id}-${index}`} className="p-4 bg-cream rounded-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div
-                        className={`w-10 h-10 ${colors.bg} rounded-xl flex items-center justify-center`}
-                      >
-                        <BookOpen className={`w-5 h-5 ${colors.icon}`} />
+      {user?.role !== "admin" && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>البرامج المسجلة</CardTitle>
+            <Link
+              to="/dashboard/programs"
+              className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+            >
+              عرض الكل
+              <ChevronLeft className="w-4 h-4" />
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {enrolledPrograms.length === 0 ? (
+              <p className="text-sm text-primary-500 text-center py-6">
+                لا توجد برامج مسجلة
+              </p>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {enrolledPrograms.slice(0, 6).map((program, index) => {
+                  const colors = PROGRAM_COLORS[index % PROGRAM_COLORS.length];
+                  return (
+                    <div key={`${program._id}-${index}`} className="p-4 bg-cream rounded-xl">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div
+                          className={`w-10 h-10 ${colors.bg} rounded-xl flex items-center justify-center`}
+                        >
+                          <BookOpen className={`w-5 h-5 ${colors.icon}`} />
+                        </div>
+                        <div>
+                          <p className="font-medium text-primary-800">
+                            {program.name}
+                          </p>
+                          <p className="text-xs text-primary-500">
+                            {program.childName}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-primary-800">
-                          {program.name}
-                        </p>
-                        <p className="text-xs text-primary-500">
-                          {program.childName}
-                        </p>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-primary-600">الفئة</span>
+                        <span className="font-medium text-primary-700 text-xs">
+                          {program.category === "concentration"
+                            ? "تركيز"
+                            : program.category === "reading"
+                              ? "قراءة"
+                              : program.category === "writing"
+                                ? "كتابة"
+                                : program.category === "behavior"
+                                  ? "سلوك"
+                                  : program.category}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-primary-600">الفئة</span>
-                      <span className="font-medium text-primary-700 text-xs">
-                        {program.category === "concentration"
-                          ? "تركيز"
-                          : program.category === "reading"
-                            ? "قراءة"
-                            : program.category === "writing"
-                              ? "كتابة"
-                              : program.category === "behavior"
-                                ? "سلوك"
-                                : program.category}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

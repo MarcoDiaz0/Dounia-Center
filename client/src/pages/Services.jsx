@@ -78,18 +78,6 @@ export default function Services() {
     },
   ];
 
-  if (settings.ccp_number) {
-    paymentMethods.push({
-      id: "ccp",
-      name: "CCP (الحساب البريدي)",
-      icon: Landmark,
-      description: "الدفع عبر مركز البريد (CCP)",
-      details: `حساب CCP رقم: ${settings.ccp_number} مفتاح: ${settings.ccp_key || "XX"} باسم: ${
-        settings.ccp_name || "مركز دنيا"
-      }`,
-    });
-  }
-
   useEffect(() => {
     fetchPrograms();
     fetchSettings();
