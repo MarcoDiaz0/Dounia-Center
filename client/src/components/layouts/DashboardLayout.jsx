@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { clsx } from 'clsx'
 import {
-  Leaf,
   LayoutDashboard,
   ClipboardList,
   Users,
@@ -18,6 +17,7 @@ import {
   CreditCard,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
+import logoImg from '@/assets/logo.png'
 import Button from '../common/Button'
 
 export default function DashboardLayout() {
@@ -58,9 +58,11 @@ export default function DashboardLayout() {
             <Menu className="w-6 h-6 text-primary-700" />
           </button>
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src={logoImg}
+              alt="Dounia Logo"
+              className="w-8 h-8 object-contain"
+            />
             <span className="font-bold text-primary-800">دنيا</span>
           </Link>
           <div className="w-10" />
@@ -88,9 +90,11 @@ export default function DashboardLayout() {
           <div className="p-6 border-b border-secondary-200">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center">
-                  <Leaf className="w-6 h-6 text-white" />
-                </div>
+                <img
+                  src={logoImg}
+                  alt="Dounia Logo"
+                  className="w-10 h-10 object-contain"
+                />
                 <div>
                   <span className="font-bold text-primary-800">مركز دنيا</span>
                   <span className="block text-xs text-primary-600">لوحة التحكم</span>

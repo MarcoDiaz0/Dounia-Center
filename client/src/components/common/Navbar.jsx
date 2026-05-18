@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Leaf, ChevronDown, User, LogIn } from "lucide-react";
+import { Menu, X, ChevronDown, User, LogIn } from "lucide-react";
 import { clsx } from "clsx";
 import Button from "./Button";
 import { useAuthStore } from "@/store/authStore";
+import logoImg from "@/assets/logo.png";
 
 const navLinks = [
   { name: "الرئيسية", href: "/" },
@@ -46,9 +47,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-transform">
-              <Leaf className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src={logoImg}
+              alt="Dounia Logo"
+              className="w-10 h-10 object-contain transform group-hover:scale-105 transition-transform"
+            />
             <div className="hidden sm:block">
               <span className="font-bold text-primary-800 text-lg">دنيا</span>
               <span className="block text-xs text-primary-600">

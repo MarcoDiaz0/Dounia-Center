@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Leaf } from "lucide-react";
 import LoginForm from "@/components/auth/LoginForm";
+import logoImg from "@/assets/logo.png";
 
 export default function Login() {
   return (
@@ -10,9 +10,11 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center">
-              <Leaf className="w-7 h-7 text-white" />
-            </div>
+            <img
+              src={logoImg}
+              alt="Dounia Logo"
+              className="w-12 h-12 object-contain"
+            />
             <div>
               <span className="font-bold text-xl text-primary-800">
                 مركز دنيا
@@ -39,8 +41,12 @@ export default function Login() {
       {/* Right Side - Decorative */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-bl from-primary-500 to-primary-700 items-center justify-center p-12">
         <div className="max-w-md text-center text-white">
-          <div className="w-24 h-24 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-8">
-            <Leaf className="w-12 h-12" />
+          <div className="w-64 h-64 bg-white rounded-[3rem] flex items-center justify-center mx-auto mb-8 shadow-2xl">
+            <img
+              src={logoImg}
+              alt="Dounia Logo"
+              className="w-56 h-56 object-contain"
+            />
           </div>
           <h2 className="text-3xl font-bold mb-4">نرافقكم نحو نمو متوازن</h2>
           <p className="text-primary-100 leading-relaxed">

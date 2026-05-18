@@ -20,6 +20,7 @@ import Card, { CardContent } from "@/components/common/Card";
 import SectionTitle from "@/components/common/SectionTitle";
 import { useAuthStore } from "@/store/authStore";
 import { programService } from "@/services/programService";
+import logoImg from "@/assets/logo.png";
 
 const iconMap = {
   Heart,
@@ -188,9 +189,11 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-3xl -rotate-3" />
                 <div className="relative bg-white rounded-3xl shadow-card p-12 flex items-center justify-center z-10">
                   <div className="text-center">
-                    <div className="w-32 h-32 mx-auto bg-primary-100 rounded-full flex items-center justify-center mb-6">
-                      <Heart className="w-16 h-16 text-primary-500" />
-                    </div>
+                    <img
+                      src={logoImg}
+                      alt="Dounia Logo"
+                      className="w-44 h-44 object-contain mx-auto mb-6"
+                    />
                     <p className="text-2xl font-bold text-primary-800 mb-2">
                       نمو متوازن
                     </p>

@@ -14,6 +14,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import programRoutes from "./routes/program.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
+import settingRoutes from "./routes/setting.routes.js";
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/programs", programRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/settings", settingRoutes);
 
 /* ─────────────────────────────────────────────────────────────
    HEALTH CHECK

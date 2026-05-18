@@ -14,6 +14,8 @@ import {
   X,
   Plus,
   Trash2,
+  Wallet,
+  Landmark,
 } from "lucide-react";
 import Button from "@/components/common/Button";
 import Card, {
@@ -26,9 +28,9 @@ import Card, {
 import { useAuthStore } from "@/store/authStore";
 import { programService } from "@/services/programService";
 import { subscriptionService } from "@/services/subscriptionService";
+import { settingsService } from "@/services/settingsService";
 import AddProgramModal from "@/components/programs/AddProgramModal";
 import toast from "react-hot-toast";
-import { Wallet } from "lucide-react";
 
 const iconMap = {
   Heart,
@@ -39,23 +41,6 @@ const iconMap = {
   GraduationCap,
 };
 
-const paymentMethods = [
-  {
-    id: "baridimob",
-    name: "BaridiMob (بريدي موب)",
-    icon: Smartphone,
-    description: "الدفع عبر تطبيق بريدي موب",
-    details: "الـ RIP الخاص بنا: 00799999002444555666",
-  },
-  {
-    id: "redotpay",
-    name: "RedotPay",
-    icon: Wallet,
-    description: "الدفع عبر تطبيق RedotPay",
-    details: "معرف الحساب (RedotPay ID): 887291044",
-  },
-];
-
 export default function Services() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,13 +50,59 @@ export default function Services() {
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [transactionNumber, setTransactionNumber] = useState("");
   const [submittingPayment, setSubmittingPayment] = useState(false);
+  const [settings, setSettings] = useState({});
 
   const { user } = useAuthStore();
   const isAdmin = user?.role === "admin";
 
+  const paymentMethods = [
+    {
+      id: "baridimob",
+      name: "BaridiMob (بريدي موب)",
+      icon: Smartphone,
+      description: "الدفع عبر تطبيق بريدي موب",
+      details: settings.baridimob_rip
+        ? `الـ RIP الخاص بنا: ${settings.baridimob_rip} ${
+            settings.baridimob_name ? `(${settings.baridimob_name})` : ""
+          }`
+        : "الـ RIP الخاص بنا: 00799999002444555666",
+    },
+    {
+      id: "redotpay",
+      name: "RedotPay",
+      icon: Wallet,
+      description: "الدفع عبر تطبيق RedotPay",
+      details: settings.redotpay_id
+        ? `معرف الحساب (RedotPay ID): ${settings.redotpay_id}`
+        : "معرف الحساب (RedotPay ID): 887291044",
+    },
+  ];
+
+  if (settings.ccp_number) {
+    paymentMethods.push({
+      id: "ccp",
+      name: "CCP (الحساب البريدي)",
+      icon: Landmark,
+      description: "الدفع عبر مركز البريد (CCP)",
+      details: `حساب CCP رقم: ${settings.ccp_number} مفتاح: ${settings.ccp_key || "XX"} باسم: ${
+        settings.ccp_name || "مركز دنيا"
+      }`,
+    });
+  }
+
   useEffect(() => {
     fetchPrograms();
+    fetchSettings();
   }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const data = await settingsService.getSettings();
+      setSettings(data);
+    } catch (error) {
+      console.error("Failed to load payment settings", error);
+    }
+  };
 
   const fetchPrograms = async () => {
     try {

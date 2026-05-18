@@ -64,7 +64,7 @@ export const getUserById = async (req, res) => {
 // Update user profile
 export const updateUser = async (req, res) => {
   try {
-    const { firstName, lastName, phone, avatar, preferences } = req.body;
+    const { fullName, phone, avatar, preferences } = req.body;
     
     // Only allow updating own profile unless admin
     if (req.user.id !== req.params.id && req.user.role !== 'admin') {
@@ -75,11 +75,10 @@ export const updateUser = async (req, res) => {
     }
 
     const updateData = {};
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (phone) updateData.phone = phone;
-    if (avatar) updateData.avatar = avatar;
-    if (preferences) updateData.preferences = preferences;
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (phone !== undefined) updateData.phone = phone;
+    if (avatar !== undefined) updateData.avatar = avatar;
+    if (preferences !== undefined) updateData.preferences = preferences;
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
