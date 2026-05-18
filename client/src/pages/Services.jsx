@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Heart,
   Brain,
@@ -7,130 +7,138 @@ import {
   Users,
   Calendar,
   GraduationCap,
-  Video,
   ClipboardCheck,
-  ArrowLeft,
   Check,
   CreditCard,
   Smartphone,
   X,
-} from 'lucide-react'
-import Button from '@/components/common/Button'
-import Card, { CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/common/Card'
-import SectionTitle from '@/components/common/SectionTitle'
+  Plus,
+  Trash2,
+} from "lucide-react";
+import Button from "@/components/common/Button";
+import Card, {
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/common/Card";
+import { useAuthStore } from "@/store/authStore";
+import { programService } from "@/services/programService";
+import { subscriptionService } from "@/services/subscriptionService";
+import AddProgramModal from "@/components/programs/AddProgramModal";
+import toast from "react-hot-toast";
+import { Wallet } from "lucide-react";
 
-const services = [
-  {
-    id: 'therapy',
-    icon: Heart,
-    title: 'الدعم النفسي والإرشاد',
-    description: 'جلسات تربوية وإرشادية فردية وجماعية',
-    longDescription: 'نقدم جلسات دعم تربوي شاملة للأطفال والمراهقين، تشمل الإرشاد السلوكي، والتعلم باللعب، وجلسات الإرشاد الأسري. نركز في مركزنا على فهم احتياجات كل طفل وتقديم الدعم المناسب.',
-    features: [
-      'جلسات فردية إرشادية',
-      'جلسات جماعية تفاعلية',
-      'إرشاد أسري للأهل',
-      'متابعة مستمرة',
-    ],
-    price: '3,500',
-    duration: 'جلسة 45 دقيقة',
-    color: 'bg-rose-100 text-rose-600',
-  },
-  {
-    id: 'learning',
-    icon: Brain,
-    title: 'برنامج صعوبات التعلم',
-    description: 'برنامج شامل لعلاج صعوبات التعلم مثل عسر القراءة والحساب',
-    longDescription: 'برنامج شامل يعالج مختلف صعوبات التعلم بما في ذلك عسر القراءة (Dyslexia)، عسر الكتابة (Dysgraphia)، وعسر الحساب (Dyscalculia). يتضمن البرنامج تقييماً شاملاً وخطة علاجية مخصصة.',
-    features: [
-      'تقييم شامل لصعوبات التعلم',
-      'خطة علاجية فردية',
-      'تمارين تفاعلية',
-      'تقارير تقدم دورية',
-    ],
-    price: '15,000',
-    duration: 'برنامج شهري',
-    color: 'bg-purple-100 text-purple-600',
-  },
-  {
-    id: 'reading',
-    icon: BookOpen,
-    title: 'تحسين القراءة والكتابة',
-    description: 'تدريب مكثف لتطوير مهارات القراءة والكتابة',
-    longDescription: 'برنامج متكامل لتحسين مهارات القراءة والكتابة عند الأطفال. يشمل تدريبات على الوعي الصوتي، فهم القراءة، الكتابة الإبداعية، والإملاء.',
-    features: [
-      'تدريبات الوعي الصوتي',
-      'تمارين فهم القراءة',
-      'الكتابة الإبداعية',
-      'تحسين الإملاء',
-    ],
-    price: '12,000',
-    duration: 'برنامج شهري',
-    color: 'bg-blue-100 text-blue-600',
-  },
-  {
-    id: 'parents',
-    icon: Users,
-    title: 'توجيه الأولياء',
-    description: 'ورشات وجلسات إرشادية للأهل لدعم أطفالهم',
-    longDescription: 'جلسات وورشات تربوية للأهل لمساعدتهم على فهم احتياجات أطفالهم وكيفية دعمهم بشكل فعال في المنزل والمدرسة.',
-    features: [
-      'ورشات تربوية',
-      'استشارات فردية',
-      'مجموعات دعم الأهل',
-      'موارد تعليمية',
-    ],
-    price: '2,500',
-    duration: 'جلسة 60 دقيقة',
-    color: 'bg-amber-100 text-amber-600',
-  },
-  {
-    id: 'followup',
-    icon: Calendar,
-    title: 'المتابعة المستمرة',
-    description: 'برنامج متابعة طويل المدى لضمان استمرار التحسن',
-    longDescription: 'برنامج متابعة شامل يتضمن جلسات دورية، تقييمات منتظمة، وتقارير تقدم مفصلة لضمان استمرار التحسن.',
-    features: [
-      'جلسات متابعة أسبوعية',
-      'تقييمات دورية',
-      'تقارير تقدم شهرية',
-      'تواصل مستمر مع المدرسة',
-    ],
-    price: '8,000',
-    duration: 'اشتراك شهري',
-    color: 'bg-teal-100 text-teal-600',
-  },
-  {
-    id: 'academic',
-    icon: GraduationCap,
-    title: 'الدعم الأكاديمي',
-    description: 'دعم دراسي شامل لتحسين الأداء الأكاديمي',
-    longDescription: 'برنامج دعم أكاديمي شامل يشمل المساعدة في الواجبات، التحضير للامتحانات، وتطوير مهارات الدراسة الفعالة.',
-    features: [
-      'دعم في المواد الدراسية',
-      'تقنيات الدراسة الفعالة',
-      'التحضير للامتحانات',
-      'تنظيم الوقت',
-    ],
-    price: '10,000',
-    duration: 'برنامج شهري',
-    color: 'bg-indigo-100 text-indigo-600',
-  },
-]
+const iconMap = {
+  Heart,
+  Brain,
+  BookOpen,
+  Users,
+  Calendar,
+  GraduationCap,
+};
 
 const paymentMethods = [
-  { id: 'ccp', name: 'CCP', icon: CreditCard, description: 'الدفع عبر الحساب البريدي الجاري' },
-  { id: 'baridimob', name: 'BaridiMob', icon: Smartphone, description: 'الدفع عبر تطبيق بريدي موب' },
-]
+  {
+    id: "baridimob",
+    name: "BaridiMob (بريدي موب)",
+    icon: Smartphone,
+    description: "الدفع عبر تطبيق بريدي موب",
+    details: "الـ RIP الخاص بنا: 00799999002444555666",
+  },
+  {
+    id: "redotpay",
+    name: "RedotPay",
+    icon: Wallet,
+    description: "الدفع عبر تطبيق RedotPay",
+    details: "معرف الحساب (RedotPay ID): 887291044",
+  },
+];
 
 export default function Services() {
-  const [selectedService, setSelectedService] = useState(null)
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [transactionNumber, setTransactionNumber] = useState("");
+  const [submittingPayment, setSubmittingPayment] = useState(false);
+
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === "admin";
+
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
+
+  const fetchPrograms = async () => {
+    try {
+      setLoading(true);
+      const data = await programService.getPrograms();
+      setPrograms(data);
+    } catch (error) {
+      toast.error("فشل تحميل البرامج");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddProgram = async (programData) => {
+    try {
+      await programService.createProgram(programData);
+      fetchPrograms();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleDeleteProgram = async (id) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا البرنامج؟")) {
+      try {
+        await programService.deleteProgram(id);
+        toast.success("تم حذف البرنامج");
+        fetchPrograms();
+      } catch (error) {
+        toast.error("فشل حذف البرنامج");
+      }
+    }
+  };
 
   const handleSelectService = (service) => {
-    setSelectedService(service)
-    setShowPaymentModal(true)
-  }
+    setSelectedService(service);
+    setSelectedMethod(null);
+    setTransactionNumber("");
+    setShowPaymentModal(true);
+  };
+
+  const handleSubmitPayment = async (e) => {
+    e.preventDefault();
+    if (!selectedMethod) {
+      toast.error("يرجى اختيار طريقة الدفع");
+      return;
+    }
+    if (!transactionNumber.trim()) {
+      toast.error("يرجى إدخال رقم المعاملة");
+      return;
+    }
+
+    try {
+      setSubmittingPayment(true);
+      await subscriptionService.createSubscription(
+        selectedService._id,
+        selectedMethod.id,
+        transactionNumber
+      );
+      toast.success("تم إرسال طلب الاشتراك بنجاح بانتظار تأكيد المسؤول");
+      setShowPaymentModal(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "فشل إرسال طلب الاشتراك");
+    } finally {
+      setSubmittingPayment(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -142,7 +150,8 @@ export default function Services() {
               خدماتنا التربوية
             </h1>
             <p className="text-lg text-primary-600 leading-relaxed">
-              نقدم مجموعة متكاملة من الخدمات التربوية والإرشادية المصممة خصيصاً لدعم نمو طفلك وتطوره
+              نقدم مجموعة متكاملة من الخدمات التربوية والإرشادية المصممة خصيصاً
+              لدعم نمو طفلك وتطوره
             </p>
           </div>
         </div>
@@ -151,41 +160,82 @@ export default function Services() {
       {/* Services Grid */}
       <section className="section-padding bg-cream">
         <div className="container-custom">
+          {isAdmin && (
+            <div className="mb-8 flex justify-end">
+              <Button icon={Plus} onClick={() => setIsAddModalOpen(true)}>
+                إضافة برنامج جديد
+              </Button>
+            </div>
+          )}
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <Card key={service.id} className="flex flex-col">
-                <CardHeader>
-                  <div className={`w-14 h-14 rounded-2xl ${service.color} flex items-center justify-center mb-4`}>
-                    <service.icon className="w-7 h-7" />
-                  </div>
-                  <CardTitle>{service.title}</CardTitle>
-                  <CardDescription>{service.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-sm text-primary-600 mb-4">{service.longDescription}</p>
-                  <ul className="space-y-2">
-                    {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-sm text-primary-700">
-                        <Check className="w-4 h-4 text-primary-500 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between w-full">
-                    <div>
-                      <p className="text-2xl font-bold text-primary-700">{service.price} <span className="text-sm font-normal">د.ج</span></p>
-                      <p className="text-sm text-primary-500">{service.duration}</p>
+            {programs.map((service) => {
+              const IconComponent = iconMap[service.icon] || BookOpen;
+              return (
+                <Card key={service._id} className="flex flex-col relative group">
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteProgram(service._id)}
+                      className="absolute top-4 left-4 p-2 bg-red-50 text-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white z-10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  <CardHeader>
+                    <div
+                      className={`w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center mb-4`}
+                    >
+                      <IconComponent className="w-7 h-7" />
                     </div>
-                  </div>
-                  <Button className="w-full" onClick={() => handleSelectService(service)}>
-                    احجز الآن
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                    <CardTitle>{service.name}</CardTitle>
+                    <CardDescription>{service.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <p className="text-sm text-primary-600 mb-4">
+                      {service.longDescription}
+                    </p>
+                    <ul className="space-y-2">
+                      {service.features.map((feature, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center gap-2 text-sm text-primary-700"
+                        >
+                          <Check className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <p className="text-2xl font-bold text-primary-700">
+                          {service.price}{" "}
+                          <span className="text-sm font-normal">د.ج</span>
+                        </p>
+                        <p className="text-sm text-primary-500">
+                          {service.duration}
+                        </p>
+                      </div>
+                    </div>
+                    {!isAdmin && (
+                      <Button
+                        className="w-full"
+                        onClick={() => handleSelectService(service)}
+                      >
+                        احجز الآن
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
+          {programs.length === 0 && !loading && (
+            <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-secondary-200">
+              <p className="text-primary-600">لا توجد برامج متوفرة حالياً</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -202,15 +252,17 @@ export default function Services() {
                 دعم تلاميذ الباكالوريا
               </h2>
               <p className="text-primary-100 text-lg mb-6 leading-relaxed">
-                برنامج دعم نفسي وأكاديمي شامل لتلاميذ البكالوريا. نساعدهم على التغلب على الضغط والقلق، وتحسين مهارات الدراسة والتحضير للامتحانات.
+                برنامج دعم نفسي وأكاديمي شامل لتلاميذ البكالوريا. نساعدهم على
+                التغلب على الضغط والقلق، وتحسين مهارات الدراسة والتحضير
+                للامتحانات.
               </p>
               <ul className="space-y-3 mb-8">
                 {[
-                  'جلسات دعم نفسي للتعامل مع القلق',
-                  'تقنيات إدارة الضغط',
-                  'استراتيجيات الدراسة الفعالة',
-                  'التحضير للامتحانات',
-                  'توجيه مهني وجامعي',
+                  "جلسات دعم نفسي للتعامل مع القلق",
+                  "تقنيات إدارة الضغط",
+                  "استراتيجيات الدراسة الفعالة",
+                  "التحضير للامتحانات",
+                  "توجيه مهني وجامعي",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
                     <Check className="w-5 h-5 text-primary-200" />
@@ -218,14 +270,21 @@ export default function Services() {
                   </li>
                 ))}
               </ul>
-              <Button variant="secondary" size="lg" onClick={() => handleSelectService({
-                id: 'bac',
-                title: 'دعم تلاميذ الباكالوريا',
-                price: '20,000',
-                duration: 'برنامج شامل',
-              })}>
-                احجز الآن
-              </Button>
+              {!isAdmin && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() =>
+                    handleSelectService({
+                      name: "دعم تلاميذ الباكالوريا",
+                      price: "20,000",
+                      duration: "برنامج شامل",
+                    })
+                  }
+                >
+                  احجز الآن
+                </Button>
+              )}
             </div>
             <div className="relative">
               <div className="aspect-square max-w-md mx-auto bg-white/10 rounded-3xl flex items-center justify-center">
@@ -272,42 +331,106 @@ export default function Services() {
             </div>
 
             <div className="bg-primary-50 rounded-2xl p-4 mb-6">
-              <p className="font-medium text-primary-800">{selectedService.title}</p>
+              <p className="font-medium text-primary-800">
+                {selectedService.name || selectedService.title}
+              </p>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-primary-600">{selectedService.duration}</span>
-                <span className="text-lg font-bold text-primary-700">{selectedService.price} د.ج</span>
+                <span className="text-primary-600">
+                  {selectedService.duration}
+                </span>
+                <span className="text-lg font-bold text-primary-700">
+                  {selectedService.price} د.ج
+                </span>
               </div>
             </div>
 
-            <p className="text-sm text-primary-600 mb-4">اختر طريقة الدفع:</p>
+            <p className="text-sm text-primary-600 mb-3">اختر طريقة الدفع:</p>
 
             <div className="space-y-3 mb-6">
-              {paymentMethods.map((method) => (
-                <button
-                  key={method.id}
-                  className="w-full flex items-center gap-4 p-4 border-2 border-secondary-200 rounded-xl hover:border-primary-400 transition-colors text-right"
-                >
-                  <div className="w-12 h-12 bg-secondary-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <method.icon className="w-6 h-6 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-primary-800">{method.name}</p>
-                    <p className="text-sm text-primary-600">{method.description}</p>
-                  </div>
-                </button>
-              ))}
+              {paymentMethods.map((method) => {
+                const isSelected = selectedMethod?.id === method.id;
+                return (
+                  <button
+                    key={method.id}
+                    onClick={() => setSelectedMethod(method)}
+                    className={`w-full flex items-center gap-4 p-4 border-2 rounded-xl transition-all text-right ${
+                      isSelected
+                        ? "border-primary-500 bg-primary-50/40 shadow-sm"
+                        : "border-secondary-200 hover:border-primary-300"
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      isSelected ? "bg-primary-100" : "bg-secondary-100"
+                    }`}>
+                      <method.icon className={`w-6 h-6 ${isSelected ? "text-primary-700" : "text-primary-600"}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-primary-800">
+                        {method.name}
+                      </p>
+                      <p className="text-xs text-primary-500 mt-0.5">
+                        {method.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            <p className="text-xs text-primary-500 text-center mb-4">
-              * سيتم التواصل معك لتأكيد الحجز وتفاصيل الدفع
-            </p>
+            {selectedMethod && (
+              <div className="mb-6 space-y-4 animate-fade-in p-4 bg-secondary-50/50 rounded-2xl border border-secondary-100">
+                <div className="bg-white p-3 rounded-xl border border-secondary-100 shadow-sm">
+                  <p className="text-xs text-primary-500 mb-1">تفاصيل الدفع:</p>
+                  <p className="text-sm font-bold text-primary-800 tracking-wider">
+                    {selectedMethod.details}
+                  </p>
+                </div>
 
-            <Button className="w-full" onClick={() => setShowPaymentModal(false)}>
-              تأكيد الحجز
-            </Button>
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-primary-700">
+                    رقم المعاملة (Transaction ID)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="أدخل رقم المعاملة بعد إرسال المبلغ..."
+                    value={transactionNumber}
+                    onChange={(e) => setTransactionNumber(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-secondary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                  />
+                  <p className="text-[11px] text-primary-500 leading-normal">
+                    * يرجى إتمام التحويل أولاً في التطبيق الخاص بك، ثم كتابة الرقم التعريفي للعملية هنا لمراجعتها وتأكيدها.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setShowPaymentModal(false)}
+              >
+                إلغاء
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleSubmitPayment}
+                disabled={submittingPayment || !selectedMethod || !transactionNumber.trim()}
+              >
+                {submittingPayment ? "جاري الإرسال..." : "تأكيد الدفع"}
+              </Button>
+            </div>
           </div>
         </div>
       )}
+
+      <AddProgramModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddProgram}
+      />
     </div>
-  )
+  );
 }
+

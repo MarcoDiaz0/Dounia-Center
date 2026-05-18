@@ -1,4 +1,5 @@
 import Resource from '../models/Resource.model.js';
+import Child from '../models/Child.model.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Get all resources
@@ -11,15 +12,34 @@ export const getResources = async (req, res) => {
       ageMax, 
       search,
       featured,
+      program,
       page = 1, 
       limit = 12 
     } = req.query;
 
-    const query = { isPublished: true };
+    let query = { isPublished: true };
     
+    // For non-admins, restrict access to premium resources
+    if (req.user && req.user.role !== 'admin') {
+      const children = await Child.find({ parent: req.user.id, isActive: true });
+      const enrolledPrograms = children.reduce((acc, child) => {
+        return [...acc, ...child.enrolledPrograms.map(p => p.toString())];
+      }, []);
+
+      // Filter: Public resources OR resources for enrolled programs
+      query = {
+        ...query,
+        $or: [
+          { program: null },
+          { program: { $in: enrolledPrograms } }
+        ]
+      };
+    }
+
     if (type) query.type = type;
     if (category) query.category = category;
     if (featured === 'true') query.isFeatured = true;
+    if (program) query.program = program;
     
     if (ageMin || ageMax) {
       query['ageRange.min'] = { $lte: parseInt(ageMax) || 18 };
@@ -31,6 +51,7 @@ export const getResources = async (req, res) => {
     }
 
     const resources = await Resource.find(query)
+      .populate('program', 'name')
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .sort({ isFeatured: -1, createdAt: -1 });
@@ -68,6 +89,21 @@ export const getResourceById = async (req, res) => {
         success: false,
         message: 'Resource not found'
       });
+    }
+
+    // Check permissions for premium resources
+    if (resource.program && req.user && req.user.role !== 'admin') {
+      const children = await Child.find({ parent: req.user.id, isActive: true });
+      const enrolledPrograms = children.reduce((acc, child) => {
+        return [...acc, ...child.enrolledPrograms.map(p => p.toString())];
+      }, []);
+
+      if (!enrolledPrograms.includes(resource.program.toString())) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You must be enrolled in the required program to access this resource.'
+        });
+      }
     }
 
     // Increment views

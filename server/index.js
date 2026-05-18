@@ -12,6 +12,8 @@ import assessmentRoutes from "./routes/assessment.routes.js";
 import resourceRoutes from "./routes/resource.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import programRoutes from "./routes/program.routes.js";
+import subscriptionRoutes from "./routes/subscription.routes.js";
 
 dotenv.config();
 
@@ -61,6 +63,8 @@ app.use("/api/assessments", assessmentRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/programs", programRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 
 /* ─────────────────────────────────────────────────────────────
    HEALTH CHECK

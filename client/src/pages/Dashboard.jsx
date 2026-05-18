@@ -18,7 +18,8 @@ import Button from "@/components/common/Button";
 import { useAuthStore } from "@/store/authStore";
 import { useChildStore } from "@/store/childStore";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { subscriptionService } from "@/services/subscriptionService";
 
 const PROGRAM_COLORS = [
   { bg: "bg-purple-100", icon: "text-purple-600" },
@@ -32,11 +33,24 @@ export default function Dashboard() {
   const { user } = useAuthStore();
   const { children, getChildren } = useChildStore();
   const { notifications, getNotifications } = useNotificationStore();
+  const [mySubscriptions, setMySubscriptions] = useState([]);
 
   useEffect(() => {
     getChildren();
     getNotifications();
+    if (user?.role === "parent") {
+      fetchMySubscriptions();
+    }
   }, []);
+
+  const fetchMySubscriptions = async () => {
+    try {
+      const data = await subscriptionService.getMySubscriptions();
+      setMySubscriptions(data);
+    } catch (e) {
+      console.error("Failed to fetch subscriptions:", e);
+    }
+  };
 
   // Derive stats dynamically
   const totalAssessments = useMemo(
@@ -49,16 +63,26 @@ export default function Dashboard() {
     [notifications]
   );
 
-  // Aggregate all enrolled programs across children
+  // Aggregate all enrolled programs across children and active subscriptions
   const enrolledPrograms = useMemo(() => {
     const programs = [];
+    // 1. Add child enrolled programs
     children.forEach((child) => {
       (child.enrolledPrograms || []).forEach((program) => {
         programs.push({ ...program, childName: child.fullName });
       });
     });
+    // 2. Add confirmed subscription programs that are not yet enrolled under children
+    mySubscriptions.forEach((sub) => {
+      if (sub.status === "confirmed" && sub.program) {
+        const alreadyAdded = programs.some((p) => p._id === sub.program._id);
+        if (!alreadyAdded) {
+          programs.push({ ...sub.program, childName: "الاشتراك نشط" });
+        }
+      }
+    });
     return programs;
-  }, [children]);
+  }, [children, mySubscriptions]);
 
   const quickStats = [
     {

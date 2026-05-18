@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import { X, Upload, FileText, CheckCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Upload, FileText, CheckCircle, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Button from '../common/Button'
 import resourceService from '@/services/resourceService'
+import { programService } from '@/services/programService'
 
 export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
+  const [programs, setPrograms] = useState([])
   
   const [formData, setFormData] = useState({
     title_ar: '',
@@ -19,9 +21,25 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
     category: 'general',
     mediaUrl: '',
     mediaPublicId: '',
+    program: '', // New field for premium resources
   })
 
   const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchPrograms();
+    }
+  }, [isOpen]);
+
+  const fetchPrograms = async () => {
+    try {
+      const data = await programService.getPrograms();
+      setPrograms(data);
+    } catch (err) {
+      console.error("Failed to fetch programs", err);
+    }
+  };
 
   if (!isOpen) return null
 
@@ -65,6 +83,7 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
         category: formData.category,
         mediaUrl: formData.mediaUrl,
         mediaPublicId: formData.mediaPublicId,
+        program: formData.program || null,
       }
 
       await resourceService.createResource(payload)
@@ -181,6 +200,28 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
                     <option value="parenting">تربوي</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="p-4 bg-primary-50 rounded-2xl border border-primary-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <Shield className="w-5 h-5 text-primary-600" />
+                  <label className="text-sm font-bold text-primary-800">صلاحية الوصول (اختياري)</label>
+                </div>
+                <select
+                  className="input-base bg-white"
+                  value={formData.program}
+                  onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                >
+                  <option value="">عام (متاح للجميع)</option>
+                  {programs.map(prog => (
+                    <option key={prog._id} value={prog._id}>
+                      مخصص لبرنامج: {prog.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-primary-600 mt-2 pr-1">
+                  إذا اخترت برنامجاً، سيتمكن فقط المشتركون فيه من رؤية هذا المصدر.
+                </p>
               </div>
 
               {/* File Upload Section */}

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,7 +11,6 @@ import {
   Shield,
   Award,
   ChevronLeft,
-  ChevronRight,
   Star,
   Quote,
   GraduationCap,
@@ -18,34 +18,17 @@ import {
 import Button from "@/components/common/Button";
 import Card, { CardContent } from "@/components/common/Card";
 import SectionTitle from "@/components/common/SectionTitle";
+import { useAuthStore } from "@/store/authStore";
+import { programService } from "@/services/programService";
 
-// Services data
-const services = [
-  {
-    icon: Heart,
-    title: "الدعم النفسي والإرشاد",
-    description: "جلسات تعليمية وتربوية شاملة للأطفال والعائلات",
-    color: "bg-rose-100 text-rose-600",
-  },
-  {
-    icon: Brain,
-    title: "صعوبات التعلم",
-    description: "برامج مخصصة للأطفال الذين يعانون من صعوبات في التعلم",
-    color: "bg-purple-100 text-purple-600",
-  },
-  {
-    icon: BookOpen,
-    title: "تحسين القراءة والكتابة",
-    description: "تدريب مكثف لتطوير مهارات القراءة والكتابة",
-    color: "bg-blue-100 text-blue-600",
-  },
-  {
-    icon: Users,
-    title: "توجيه الأولياء",
-    description: "إرشادات وتوجيهات للأهل لدعم أطفالهم بشكل أفضل",
-    color: "bg-amber-100 text-amber-600",
-  },
-];
+const iconMap = {
+  Heart,
+  Brain,
+  BookOpen,
+  Users,
+  Calendar: ArrowLeft, // Fallback
+  GraduationCap,
+};
 
 // Journey steps
 const journeySteps = [
@@ -118,6 +101,22 @@ const features = [
 ];
 
 export default function Home() {
+  const [services, setServices] = useState([]);
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === "admin";
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const data = await programService.getPrograms();
+        setServices(data.slice(0, 4)); // Show first 4
+      } catch (error) {
+        console.error("Failed to fetch services", error);
+      }
+    };
+    fetchServices();
+  }, []);
+
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
@@ -247,8 +246,8 @@ export default function Home() {
                 </p>
                 <p>
                   نؤمن بأن كل طفل فريد من نوعه ويستحق الدعم المناسب لتحقيق
-                  إمكاناته الكاملة. يعمل مركزنا جنباً
-                  إلى جنب مع العائلات لتوفير بيئة داعمة ومحفزة.
+                  إمكاناته الكاملة. يعمل مركزنا جنباً إلى جنب مع العائلات لتوفير
+                  بيئة داعمة ومحفزة.
                 </p>
                 <p>
                   نقدم برامج متنوعة تشمل الدعم النفسي، علاج صعوبات التعلم،
@@ -277,30 +276,33 @@ export default function Home() {
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service, index) => (
-              <Card key={index} hover className="group">
-                <CardContent>
-                  <div
-                    className={`w-14 h-14 rounded-2xl ${service.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}
-                  >
-                    <service.icon className="w-7 h-7" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-primary-800 mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-primary-600 text-sm leading-relaxed">
-                    {service.description}
-                  </p>
-                  <Link
-                    to="/services"
-                    className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-primary-600 hover:text-primary-700 group"
-                  >
-                    <span>المزيد</span>
-                    <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+            {services.map((service, index) => {
+              const IconComponent = iconMap[service.icon] || BookOpen;
+              return (
+                <Card key={index} hover className="group">
+                  <CardContent>
+                    <div
+                      className={`w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}
+                    >
+                      <IconComponent className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-primary-800 mb-2">
+                      {service.name}
+                    </h3>
+                    <p className="text-primary-600 text-sm leading-relaxed">
+                      {service.description}
+                    </p>
+                    <Link
+                      to="/services"
+                      className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-primary-600 hover:text-primary-700 group"
+                    >
+                      <span>المزيد</span>
+                      <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="text-center mt-10">
@@ -445,16 +447,18 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <Link to="/services">
-              <Button
-                variant="secondary"
-                size="lg"
-                icon={ArrowLeft}
-                iconPosition="end"
-              >
-                اكتشف البرنامج
-              </Button>
-            </Link>
+            {!isAdmin && (
+              <Link to="/services">
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  icon={ArrowLeft}
+                  iconPosition="end"
+                >
+                  اكتشف البرنامج
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>

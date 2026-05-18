@@ -73,6 +73,11 @@ const resourceSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+  program: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Program',
+    default: null
   }
 }, {
   timestamps: true

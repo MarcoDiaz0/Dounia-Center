@@ -121,9 +121,17 @@ export default function Resources() {
               <Icon className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${colorClass} mb-2`}>
-                {categories.find((c) => c.id === resource.type)?.name || resource.type}
-              </span>
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${colorClass}`}>
+                  {categories.find((c) => c.id === resource.type)?.name || resource.type}
+                </span>
+                {resource.program && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-amber-100 text-amber-700">
+                    <Shield className="w-3 h-3" />
+                    {resource.program.name || 'برنامج خاص'}
+                  </span>
+                )}
+              </div>
               <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-primary-800 line-clamp-2">{title}</h3>
                 {isAdmin && (
