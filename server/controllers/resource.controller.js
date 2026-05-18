@@ -231,7 +231,13 @@ export const updateResource = async (req, res) => {
 
     // If new media is provided, delete the old one from Cloudinary
     if (req.body.mediaPublicId && oldResource.mediaPublicId && req.body.mediaPublicId !== oldResource.mediaPublicId) {
-      const resourceType = oldResource.type === 'pdfs' || oldResource.mediaUrl?.endsWith('.pdf') ? 'raw' : 'image';
+      let resourceType = 'image';
+      const url = oldResource.mediaUrl || '';
+      if (url.endsWith('.pdf')) {
+        resourceType = 'raw';
+      } else if (oldResource.type === 'video' || url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi') || url.endsWith('.mkv') || url.endsWith('.webm')) {
+        resourceType = 'video';
+      }
       await cloudinary.uploader.destroy(oldResource.mediaPublicId, { resource_type: resourceType });
     }
 
@@ -269,8 +275,13 @@ export const deleteResource = async (req, res) => {
 
     // Delete from Cloudinary if exists
     if (resource.mediaPublicId) {
-      // Determine resource type (raw for pdfs, image for images)
-      const resourceType = resource.type === 'pdfs' || resource.mediaUrl?.endsWith('.pdf') ? 'raw' : 'image';
+      let resourceType = 'image';
+      const url = resource.mediaUrl || '';
+      if (url.endsWith('.pdf')) {
+        resourceType = 'raw';
+      } else if (resource.type === 'video' || url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi') || url.endsWith('.mkv') || url.endsWith('.webm')) {
+        resourceType = 'video';
+      }
       await cloudinary.uploader.destroy(resource.mediaPublicId, { resource_type: resourceType });
     }
 

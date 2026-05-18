@@ -65,8 +65,9 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
       setError(null)
     } catch (err) {
       setUploading(false)
-      setError('فشل رفع الملف')
-      toast.error('فشل رفع الملف')
+      const msg = err?.response?.data?.message || err?.message || 'فشل رفع الملف'
+      setError(msg)
+      toast.error(`فشل رفع الملف: ${msg}`)
       console.error(err)
     }
   }
@@ -78,7 +79,10 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
       
       const payload = {
         title: { ar: formData.title_ar, en: formData.title_en },
-        description: { ar: formData.description_ar, en: formData.description_en },
+        description: { 
+          ar: formData.description_ar, 
+          en: formData.description_en || formData.description_ar 
+        },
         type: formData.type,
         category: formData.category,
         mediaUrl: formData.mediaUrl,
@@ -100,8 +104,9 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
         setFile(null)
       }, 1500)
     } catch (err) {
-      setError('فشل إضافة المصدر')
-      toast.error('فشل إضافة المصدر')
+      const msg = err?.response?.data?.message || err?.message || 'فشل إضافة المصدر'
+      setError(msg)
+      toast.error(`فشل إضافة المصدر: ${msg}`)
       console.error(err)
     } finally {
       setLoading(false)
@@ -158,15 +163,27 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-primary-700 mb-2">الوصف (عربي)</label>
-                <textarea
-                  required
-                  rows="3"
-                  className="input-base"
-                  value={formData.description_ar}
-                  onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
-                ></textarea>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">الوصف (عربي)</label>
+                  <textarea
+                    required
+                    rows="3"
+                    className="input-base"
+                    value={formData.description_ar}
+                    onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">Description (English)</label>
+                  <textarea
+                    required
+                    rows="3"
+                    className="input-base"
+                    value={formData.description_en}
+                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                  ></textarea>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -226,7 +243,7 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
 
               {/* File Upload Section */}
               <div className="p-6 bg-secondary-50 rounded-2xl border-2 border-dashed border-secondary-200">
-                <label className="block text-sm font-semibold text-primary-700 mb-4 text-center">رفع ملف (PDF أو صورة)</label>
+                <label className="block text-sm font-semibold text-primary-700 mb-4 text-center">رفع ملف (PDF، صورة، أو فيديو)</label>
                 
                 {!formData.mediaUrl ? (
                   <div className="flex flex-col items-center gap-4">
@@ -235,7 +252,7 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
                       id="file-upload"
                       className="hidden"
                       onChange={handleFileChange}
-                      accept=".pdf,image/*"
+                      accept=".pdf,image/*,video/*"
                     />
                     <label
                       htmlFor="file-upload"

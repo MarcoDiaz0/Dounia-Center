@@ -15,6 +15,7 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
     longDescription: "",
     features: [""],
   });
+  const [errors, setErrors] = useState({});
 
   const categories = [
     { id: "general", name: "عام" },
@@ -32,6 +33,7 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
     const newFeatures = [...formData.features];
     newFeatures[index] = value;
     setFormData({ ...formData, features: newFeatures });
+    if (errors.features) setErrors({ ...errors, features: null });
   };
 
   const addFeatureField = () => {
@@ -43,8 +45,42 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
     setFormData({ ...formData, features: newFeatures });
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "اسم البرنامج مطلوب";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "يجب أن يكون اسم البرنامج 3 أحرف على الأقل";
+    }
+
+    if (!formData.price.trim()) {
+      newErrors.price = "السعر مطلوب";
+    }
+
+    if (!formData.duration.trim()) {
+      newErrors.duration = "المدة مطلوبة";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "الوصف القصير مطلوب";
+    }
+
+    const activeFeatures = formData.features.filter(f => f.trim() !== "");
+    if (activeFeatures.length === 0) {
+      newErrors.features = "يرجى إضافة ميزة واحدة على الأقل";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+    if (!validate()) {
+      toast.error("يرجى ملء الحقول المطلوبة وتصحيح الأخطاء المحددة");
+      return;
+    }
     try {
       // Filter out empty features
       const cleanData = {
@@ -65,7 +101,8 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
         features: [""],
       });
     } catch (err) {
-      toast.error("فشل إضافة البرنامج");
+      const msg = err?.response?.data?.message || err?.message || "فشل إضافة البرنامج";
+      toast.error(`فشل إضافة البرنامج: ${msg}`);
     }
   };
 
@@ -87,11 +124,15 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
               <label className="text-sm font-medium text-primary-700">اسم البرنامج</label>
               <input
                 required
-                className="input-base"
+                className={`input-base ${errors.name ? "border-red-500 focus:ring-red-200" : ""}`}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (errors.name) setErrors({ ...errors, name: null });
+                }}
                 placeholder="مثال: تحسين القراءة"
               />
+              {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
             </div>
 
             <div className="space-y-2">
@@ -109,22 +150,30 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
               <label className="text-sm font-medium text-primary-700">السعر (د.ج)</label>
               <input
                 required
-                className="input-base"
+                className={`input-base ${errors.price ? "border-red-500 focus:ring-red-200" : ""}`}
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                placeholder="مثال: 5,000"
+                onChange={(e) => {
+                  setFormData({ ...formData, price: e.target.value });
+                  if (errors.price) setErrors({ ...errors, price: null });
+                }}
+                placeholder="مثال: 5000"
               />
+              {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-primary-700">المدة</label>
               <input
                 required
-                className="input-base"
+                className={`input-base ${errors.duration ? "border-red-500 focus:ring-red-200" : ""}`}
                 value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, duration: e.target.value });
+                  if (errors.duration) setErrors({ ...errors, duration: null });
+                }}
                 placeholder="مثال: جلسة 45 دقيقة"
               />
+              {errors.duration && <p className="text-xs text-red-500 mt-1">{errors.duration}</p>}
             </div>
           </div>
 
@@ -132,11 +181,15 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
             <label className="text-sm font-medium text-primary-700">وصف قصير</label>
             <input
               required
-              className="input-base"
+              className={`input-base ${errors.description ? "border-red-500 focus:ring-red-200" : ""}`}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, description: e.target.value });
+                if (errors.description) setErrors({ ...errors, description: null });
+              }}
               placeholder="وصف يظهر في البطاقة"
             />
+            {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
           </div>
 
           <div className="space-y-2">
@@ -151,6 +204,7 @@ export default function AddProgramModal({ isOpen, onClose, onAdd }) {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary-700">المميزات</label>
+            {errors.features && <p className="text-xs text-red-500 mt-1 mb-2">{errors.features}</p>}
             <div className="space-y-3">
               {formData.features.map((feature, index) => (
                 <div key={index} className="flex gap-2">
