@@ -34,6 +34,7 @@ export default function DashboardLayout() {
       ? [{ name: 'طلبات الاشتراك', href: '/dashboard/subscriptions', icon: CreditCard }]
       : [{ name: 'البرامج المسجلة', href: '/dashboard/programs', icon: BookOpen }]
     ),
+    { name: 'حصص الاستشارة', href: '/dashboard/sessions', icon: Calendar },
     { name: 'الإشعارات', href: '/dashboard/notifications', icon: Bell },
     { name: 'الإعدادات', href: '/dashboard/settings', icon: Settings },
   ]

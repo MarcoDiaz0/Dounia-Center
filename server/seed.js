@@ -8,6 +8,7 @@
  */
 
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -28,7 +29,7 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ["parent", "admin"], default: "parent" },
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const programs = [
@@ -87,7 +88,12 @@ const programs = [
     price: "2,500",
     duration: "جلسة 60 دقيقة",
     icon: "Users",
-    features: ["ورشات تربوية", "استشارات فردية", "مجموعات دعم الأهل", "موارد تعليمية"],
+    features: [
+      "ورشات تربوية",
+      "استشارات فردية",
+      "مجموعات دعم الأهل",
+      "موارد تعليمية",
+    ],
     longDescription:
       "جلسات وورشات تربوية للأهل لمساعدتهم على فهم احتياجات أطفالهم وكيفية دعمهم بشكل فعال في المنزل والمدرسة.",
   },
@@ -108,7 +114,7 @@ const Program =
       features: [String],
       longDescription: String,
       isActive: { type: Boolean, default: true },
-    })
+    }),
   );
 
 const users = [
@@ -139,9 +145,12 @@ async function seed() {
         console.log(`⚠️  User already exists: ${userData.email} — skipping`);
         continue;
       }
-      await User.create(userData);
+      await User.create({
+        ...userData,
+        password: await bcrypt.hash(userData.password, 10),
+      });
       console.log(
-        `✅ Created ${userData.role}: ${userData.email} / ${userData.password}`
+        `✅ Created ${userData.role}: ${userData.email} / ${userData.password}`,
       );
     }
 

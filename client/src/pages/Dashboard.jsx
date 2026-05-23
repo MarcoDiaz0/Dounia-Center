@@ -160,7 +160,8 @@ export default function Dashboard() {
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </CardHeader>
-            <CardContent>
+            <p className="text-sm text-primary-500 mb-2">عدد الأطفال: {children.length} | إجمالي التقييمات: {totalAssessments}</p>
+    <CardContent>
               {children.length === 0 ? (
                 <p className="text-sm text-primary-500 text-center py-6">
                   لا يوجد أطفال بعد
@@ -239,48 +240,46 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {notifications.length === 0 ? (
-                <p className="text-sm text-primary-500 text-center py-4">
-                  لا توجد إشعارات جديدة
-                </p>
-              ) : (
-                notifications.slice(0, 5).map((notif) => (
+              {notifications.filter(n => !n.isRead).slice(0, 3).map((notif) => (
+                <div
+                  key={notif._id}
+                  className={`flex gap-3 pb-4 border-b border-secondary-100 last:border-0 last:pb-0 ${notif.isRead ? "opacity-60" : ""}`}
+                >
                   <div
-                    key={notif._id}
-                    className={`flex gap-3 pb-4 border-b border-secondary-100 last:border-0 last:pb-0 ${notif.isRead ? "opacity-60" : ""}`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      notif.type === "child_added"
+                        ? "bg-primary-100 text-primary-600"
+                        : notif.type === "session"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-amber-100 text-amber-600"
+                    }`}
                   >
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                        notif.type === "child_added"
-                          ? "bg-primary-100 text-primary-600"
-                          : notif.type === "session"
-                            ? "bg-blue-100 text-blue-600"
-                            : "bg-amber-100 text-amber-600"
-                      }`}
-                    >
-                      {notif.type === "child_added" ? (
-                        <Users className="w-4 h-4" />
-                      ) : notif.type === "session" ? (
-                        <Calendar className="w-4 h-4" />
-                      ) : (
-                        <Bell className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-primary-700 line-clamp-2">
-                        {notif.message}
-                      </p>
-                      <p className="text-xs text-primary-500 mt-1">
-                        {new Date(notif.createdAt).toLocaleDateString("ar-EG", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
+                    {notif.type === "child_added" ? (
+                      <Users className="w-4 h-4" />
+                    ) : notif.type === "session" ? (
+                      <Calendar className="w-4 h-4" />
+                    ) : (
+                      <Bell className="w-4 h-4" />
+                    )}
                   </div>
-                ))
-              )}
-            </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-primary-700 line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <p className="text-xs text-primary-500 mt-1">
+                      {new Date(notif.createdAt).toLocaleDateString("ar-EG", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              {notifications.filter(n => !n.isRead).length > 3 && (
+                <Link to="/dashboard/notifications" className="text-sm text-primary-600 hover:text-primary-700 block mt-2">
+                  عرض كل الإشعارات غير المقروءة
+                </Link>
+              )}            </div>
           </CardContent>
         </Card>
       </div>

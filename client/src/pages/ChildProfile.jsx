@@ -451,13 +451,13 @@ export default function ChildProfile() {
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0d5c5" />
-                      <XAxis dataKey="date" stroke="#5f5143" />
-                      <YAxis domain={[0, 100]} stroke="#5f5143" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#eccbd2" />
+                      <XAxis dataKey="date" stroke="#3b2c60" />
+                      <YAxis domain={[0, 100]} stroke="#3b2c60" />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: "white",
-                          border: "1px solid #e0d5c5",
+                          border: "1px solid #eccbd2",
                           borderRadius: "12px",
                         }}
                       />

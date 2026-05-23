@@ -25,6 +25,7 @@ import DashboardPrograms from "./dashboard/DashboardPrograms";
 import DashboardNotifications from "./dashboard/DashboardNotifications";
 import DashboardSettings from "./dashboard/DashboardSettings";
 import DashboardSubscriptions from "./dashboard/DashboardSubscriptions";
+import DashboardSessions from "./dashboard/DashboardSessions";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -95,6 +96,7 @@ export default function AppRouter() {
         <Route path="notifications" element={<DashboardNotifications />} />
         <Route path="settings" element={<DashboardSettings />} />
         <Route path="subscriptions" element={<DashboardSubscriptions />} />
+        <Route path="sessions" element={<DashboardSessions />} />
       </Route>
     </Routes>
   );

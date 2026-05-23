@@ -12,6 +12,7 @@ import {
   X,
   Plus,
   Trash2,
+  Shield,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Card, { CardContent } from '@/components/common/Card'
