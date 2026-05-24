@@ -33,6 +33,13 @@ export const register = async (req, res) => {
     const { fullName, email, password, phone } = req.body;
     const normalizedEmail = email?.trim().toLowerCase();
 
+    if (!fullName || !normalizedEmail || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Full name, email, and password are required",
+      });
+    }
+
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({
@@ -41,12 +48,15 @@ export const register = async (req, res) => {
       });
     }
 
-    const user = await User.create({
+    const user = new User({
       fullName,
       email: normalizedEmail,
       password,
       phone,
     });
+
+    await user.save();
+    console.log("registered user", user._id.toString());
 
     const token = generateToken(user._id);
     sendTokenCookie(res, token);
@@ -59,9 +69,18 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Register error:", error);
+
+    const isValidationError = error.name === "ValidationError";
+    const isDuplicateEmail = error.code === 11000;
+
+    res.status(isValidationError || isDuplicateEmail ? 400 : 500).json({
       success: false,
-      message: "Registration failed",
+      message: isDuplicateEmail
+        ? "User already exists"
+        : isValidationError
+          ? "Registration data is invalid"
+          : "Registration failed",
       error: error.message,
     });
   }
@@ -100,31 +119,19 @@ export const login = async (req, res) => {
       });
     }
 
-    let isMatch = await user.comparePassword(password);
-
-    if (
-      isMatch &&
-      !(
-        user.password.startsWith("$2a$") ||
-        user.password.startsWith("$2b$") ||
-        user.password.startsWith("$2y$")
-      )
-    ) {
-      user.password = password;
-      user.markModified("password");
-      await user.save();
-      user.password = undefined;
-    }
-
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
+    console.log(req.body, user.password);
 
-    user.lastLogin = new Date();
-    await user.save();
+    await User.findByIdAndUpdate(user._id, {
+      lastLogin: new Date(),
+    });
+    console.log("lastLogin updated for user", user._id.toString());
 
     const token = generateToken(user._id);
     sendTokenCookie(res, token);

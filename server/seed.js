@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -136,10 +135,7 @@ async function seed() {
         console.log(`⚠️  User already exists: ${userData.email} — skipping`);
         continue;
       }
-      await User.create({
-        ...userData,
-        password: await bcrypt.hash(userData.password, 10),
-      });
+      await User.create(userData);
       console.log(
         `✅ Created ${userData.role}: ${userData.email} / ${userData.password}`,
       );

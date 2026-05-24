@@ -20,11 +20,23 @@ import sessionRoutes from "./routes/session.routes.js";
 dotenv.config();
 
 const app = express();
-const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-const MONGODB_URI = process.env.MONGODB_URI || (!isProduction ? "mongodb://localhost:27017/dounia_center" : null);
+const isProduction =
+  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  (!isProduction ? "mongodb://localhost:27017/dounia_center" : null);
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+].filter(Boolean);
 
 if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI environment variable is required for production deployments.");
+  throw new Error(
+    "MONGODB_URI environment variable is required for production deployments.",
+  );
 }
 
 let cachedConnectionPromise = null;
@@ -61,7 +73,13 @@ export const connectToDatabase = async () => {
 
 app.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   }),
 );
