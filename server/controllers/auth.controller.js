@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.model.js";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "dounia-center-secret-key-change-in-production";
+const JWT_SECRET = process.env.JWT_SECRET || "dounia-center";
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 const IS_PROD = process.env.NODE_ENV === "production";
