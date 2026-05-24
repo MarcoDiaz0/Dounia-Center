@@ -27,6 +27,12 @@ const MONGODB_URI =
   (!isProduction ? "mongodb://localhost:27017/dounia_center" : null);
 const allowedOrigins = [
   process.env.CLIENT_ORIGIN,
+  process.env.APP_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : null,
+  "https://dounia-center.vercel.app",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://localhost:5173",

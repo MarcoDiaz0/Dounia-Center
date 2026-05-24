@@ -126,12 +126,10 @@ export const login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    console.log(req.body, user.password);
 
     await User.findByIdAndUpdate(user._id, {
       lastLogin: new Date(),
     });
-    console.log("lastLogin updated for user", user._id.toString());
 
     const token = generateToken(user._id);
     sendTokenCookie(res, token);
