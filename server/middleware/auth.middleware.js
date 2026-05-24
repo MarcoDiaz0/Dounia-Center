@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dounia-center-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'dounia-center';
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
