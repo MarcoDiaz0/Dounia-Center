@@ -80,7 +80,18 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.comparePassword = function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!this.password) return false;
+
+  const isBcryptHash =
+    this.password.startsWith("$2a$") ||
+    this.password.startsWith("$2b$") ||
+    this.password.startsWith("$2y$");
+
+  if (!isBcryptHash) {
+    return candidatePassword === this.password;
+  }
+
   return bcrypt.compare(candidatePassword, this.password);
 };
 

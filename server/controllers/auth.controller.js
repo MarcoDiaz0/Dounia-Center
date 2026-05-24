@@ -31,8 +31,9 @@ const sendTokenCookie = (res, token) => {
 export const register = async (req, res) => {
   try {
     const { fullName, email, password, phone } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -42,7 +43,7 @@ export const register = async (req, res) => {
 
     const user = await User.create({
       fullName,
-      email,
+      email: normalizedEmail,
       password,
       phone,
     });
@@ -73,15 +74,18 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
       });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: normalizedEmail }).select(
+      "+password",
+    );
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -96,7 +100,21 @@ export const login = async (req, res) => {
       });
     }
 
-    const isMatch = await user.comparePassword(password);
+    let isMatch = await user.comparePassword(password);
+
+    if (
+      isMatch &&
+      !(
+        user.password.startsWith("$2a$") ||
+        user.password.startsWith("$2b$") ||
+        user.password.startsWith("$2y$")
+      )
+    ) {
+      user.password = password;
+      user.markModified("password");
+      await user.save();
+      user.password = undefined;
+    }
 
     if (!isMatch) {
       return res.status(401).json({
