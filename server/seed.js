@@ -1,12 +1,3 @@
-/**
- * Seed Script — creates an admin and a parent user in MongoDB.
- *
- * Usage:
- *   node server/seed.js
- *
- * Requires the server's .env to be present (or MONGODB_URI env var set).
- */
-
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
