@@ -23,10 +23,10 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
+  { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61590388108868', label: 'Facebook' },
+  { icon: Instagram, href: 'https://www.instagram.com/dounia.innergrowth?igsh=eW12dG95OWYwZTM5', label: 'Instagram' },
   { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Youtube, href: '#', label: 'Youtube' },
+  // { icon: Youtube, href: '#', label: 'Youtube' },
 ]
 
 export default function Footer() {

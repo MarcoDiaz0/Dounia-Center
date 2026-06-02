@@ -14,7 +14,10 @@ import Notification from "../models/Notification.model.js";
 // Get all children for parent or all children for admin
 export const getChildren = async (req, res) => {
   try {
-    const query = req.user.role === "admin" ? { isActive: true } : { parent: req.user.id, isActive: true };
+    const query =
+      req.user.role === "admin"
+        ? { isActive: true }
+        : { parent: req.user.id, isActive: true };
     const children = await Child.find(query)
       .populate("parent", "fullName email")
       .populate("enrolledPrograms")
@@ -38,7 +41,10 @@ export const getChildren = async (req, res) => {
 // Get child by ID
 export const getChildById = async (req, res) => {
   try {
-    const query = req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id };
+    const query =
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id };
     const child = await Child.findOne(query)
       .populate("parent", "fullName email")
       .populate("enrolledPrograms")
@@ -77,10 +83,38 @@ export const createChild = async (req, res) => {
       specialNeeds,
       allergies,
       medicalNotes,
+      parentId,
     } = req.body;
 
+    let parent = req.user.id;
+
+    if (req.user.role === "admin") {
+      if (!parentId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Parent selection is required for admin-created child profiles",
+        });
+      }
+
+      const parentUser = await User.findOne({
+        _id: parentId,
+        role: "parent",
+        isActive: true,
+      });
+
+      if (!parentUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Selected parent was not found",
+        });
+      }
+
+      parent = parentUser._id;
+    }
+
     const child = await Child.create({
-      parent: req.user.id,
+      parent,
       firstName,
       lastName,
       dateOfBirth,
@@ -99,7 +133,7 @@ export const createChild = async (req, res) => {
         message: `تمت إضافة طفل جديد: ${firstName} ${lastName} من قبل ${req.user.fullName}`,
         type: "child_added",
         relatedId: child._id,
-      })
+      }),
     );
     await Promise.all(notificationPromises);
 
@@ -152,7 +186,9 @@ export const updateChild = async (req, res) => {
       updateData.developmentalScores = developmentalScores;
 
     const child = await Child.findOneAndUpdate(
-      (req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }),
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
       updateData,
       { new: true, runValidators: true },
     )
@@ -185,7 +221,9 @@ export const updateChild = async (req, res) => {
 export const deleteChild = async (req, res) => {
   try {
     const child = await Child.findOneAndUpdate(
-      (req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }),
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
       { isActive: false },
       { new: true },
     );
@@ -216,7 +254,9 @@ export const addMilestone = async (req, res) => {
     const { title, category, achievedAt, notes } = req.body;
 
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -267,7 +307,9 @@ export const enrollProgram = async (req, res) => {
     }
 
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -306,7 +348,9 @@ export const enrollProgram = async (req, res) => {
 export const unenrollProgram = async (req, res) => {
   try {
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -345,7 +389,9 @@ export const addAssessment = async (req, res) => {
     const { date, type, results } = req.body;
 
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -383,7 +429,9 @@ export const addAssessment = async (req, res) => {
 export const deleteAssessment = async (req, res) => {
   try {
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -425,7 +473,9 @@ export const addNote = async (req, res) => {
     const { content, date } = req.body;
 
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {
@@ -462,7 +512,9 @@ export const addNote = async (req, res) => {
 export const deleteNote = async (req, res) => {
   try {
     const child = await Child.findOne(
-      req.user.role === "admin" ? { _id: req.params.id } : { _id: req.params.id, parent: req.user.id }
+      req.user.role === "admin"
+        ? { _id: req.params.id }
+        : { _id: req.params.id, parent: req.user.id },
     );
 
     if (!child) {

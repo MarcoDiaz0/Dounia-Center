@@ -13,7 +13,14 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["child_added", "assessment_completed", "system", "subscription", "session"],
+      enum: [
+        "child_added",
+        "assessment_completed",
+        "assessment_message",
+        "system",
+        "subscription",
+        "session",
+      ],
       default: "system",
     },
     relatedId: {
@@ -27,7 +34,7 @@ const notificationSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 notificationSchema.index({ recipient: 1, createdAt: -1 });

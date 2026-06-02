@@ -43,6 +43,7 @@ const iconMap = {
 
 export default function Services() {
   const [programs, setPrograms] = useState([]);
+  const [bacProgram, setBacProgram] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -96,7 +97,11 @@ export default function Services() {
     try {
       setLoading(true);
       const data = await programService.getPrograms();
-      setPrograms(data);
+      const bac = data.find((program) => program.systemKey === "bac_support");
+      setBacProgram(bac || null);
+      setPrograms(
+        data.filter((program) => program.systemKey !== "bac_support"),
+      );
     } catch (error) {
       toast.error("فشل تحميل البرامج");
     } finally {
@@ -148,7 +153,7 @@ export default function Services() {
       await subscriptionService.createSubscription(
         selectedService._id,
         selectedMethod.id,
-        transactionNumber
+        transactionNumber,
       );
       toast.success("تم إرسال طلب الاشتراك بنجاح بانتظار تأكيد المسؤول");
       setShowPaymentModal(false);
@@ -191,7 +196,10 @@ export default function Services() {
             {programs.map((service) => {
               const IconComponent = iconMap[service.icon] || BookOpen;
               return (
-                <Card key={service._id} className="flex flex-col relative group">
+                <Card
+                  key={service._id}
+                  className="flex flex-col relative group"
+                >
                   {isAdmin && (
                     <button
                       onClick={() => handleDeleteProgram(service._id)}
@@ -259,64 +267,52 @@ export default function Services() {
       </section>
 
       {/* Bac Support Section */}
-      <section className="section-padding bg-gradient-to-l from-primary-600 to-primary-700 text-white">
-        <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
-                <GraduationCap className="w-4 h-4" />
-                <span>برنامج خاص</span>
+      {bacProgram && (
+        <section className="section-padding bg-gradient-to-l from-primary-600 to-primary-700 text-white">
+          <div className="container-custom">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>برنامج خاص</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  {bacProgram.name}
+                </h2>
+                <p className="text-primary-100 text-lg mb-6 leading-relaxed">
+                  {bacProgram.longDescription || bacProgram.description}
+                </p>
+                <ul className="space-y-3 mb-8">
+                  {(bacProgram.features || []).map((item, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <Check className="w-5 h-5 text-primary-200" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                {!isAdmin && (
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => handleSelectService(bacProgram)}
+                  >
+                    احجز الآن
+                  </Button>
+                )}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                دعم تلاميذ الباكالوريا
-              </h2>
-              <p className="text-primary-100 text-lg mb-6 leading-relaxed">
-                برنامج دعم نفسي وأكاديمي شامل لتلاميذ البكالوريا. نساعدهم على
-                التغلب على الضغط والقلق، وتحسين مهارات الدراسة والتحضير
-                للامتحانات.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  "جلسات دعم نفسي للتعامل مع القلق",
-                  "تقنيات إدارة الضغط",
-                  "استراتيجيات الدراسة الفعالة",
-                  "التحضير للامتحانات",
-                  "توجيه مهني وجامعي",
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-primary-200" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              {!isAdmin && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() =>
-                    handleSelectService({
-                      name: "دعم تلاميذ الباكالوريا",
-                      price: "20,000",
-                      duration: "برنامج شامل",
-                    })
-                  }
-                >
-                  احجز الآن
-                </Button>
-              )}
-            </div>
-            <div className="relative">
-              <div className="aspect-square max-w-md mx-auto bg-white/10 rounded-3xl flex items-center justify-center">
-                <div className="text-center p-8">
-                  <GraduationCap className="w-24 h-24 mx-auto mb-4 text-primary-200" />
-                  <p className="text-2xl font-bold">برنامج شامل</p>
-                  <p className="text-primary-200">للنجاح في الباكالوريا</p>
+              <div className="relative">
+                <div className="aspect-square max-w-md mx-auto bg-white/10 rounded-3xl flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <GraduationCap className="w-24 h-24 mx-auto mb-4 text-primary-200" />
+                    <p className="text-2xl font-bold">{bacProgram.duration}</p>
+                    <p className="text-primary-200">{bacProgram.description}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="section-padding bg-white">
@@ -340,7 +336,9 @@ export default function Services() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-3xl w-full max-w-md p-6 animate-fade-in">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-primary-800">إتمام الحجز</h3>
+              <h3 className="text-xl font-bold text-primary-800">
+                إتمام الحجز
+              </h3>
               <button
                 onClick={() => setShowPaymentModal(false)}
                 className="p-2 rounded-xl hover:bg-primary-50 transition-colors"
@@ -378,10 +376,14 @@ export default function Services() {
                         : "border-secondary-200 hover:border-primary-300"
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isSelected ? "bg-primary-100" : "bg-secondary-100"
-                    }`}>
-                      <method.icon className={`w-6 h-6 ${isSelected ? "text-primary-700" : "text-primary-600"}`} />
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        isSelected ? "bg-primary-100" : "bg-secondary-100"
+                      }`}
+                    >
+                      <method.icon
+                        className={`w-6 h-6 ${isSelected ? "text-primary-700" : "text-primary-600"}`}
+                      />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-primary-800">
@@ -418,7 +420,8 @@ export default function Services() {
                     className="w-full px-4 py-3 rounded-xl border border-secondary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   />
                   <p className="text-[11px] text-primary-500 leading-normal">
-                    * يرجى إتمام التحويل أولاً في التطبيق الخاص بك، ثم كتابة الرقم التعريفي للعملية هنا لمراجعتها وتأكيدها.
+                    * يرجى إتمام التحويل أولاً في التطبيق الخاص بك، ثم كتابة
+                    الرقم التعريفي للعملية هنا لمراجعتها وتأكيدها.
                   </p>
                 </div>
               </div>
@@ -435,7 +438,11 @@ export default function Services() {
               <Button
                 className="flex-1"
                 onClick={handleSubmitPayment}
-                disabled={submittingPayment || !selectedMethod || !transactionNumber.trim()}
+                disabled={
+                  submittingPayment ||
+                  !selectedMethod ||
+                  !transactionNumber.trim()
+                }
               >
                 {submittingPayment ? "جاري الإرسال..." : "تأكيد الدفع"}
               </Button>
@@ -452,4 +459,3 @@ export default function Services() {
     </div>
   );
 }
-

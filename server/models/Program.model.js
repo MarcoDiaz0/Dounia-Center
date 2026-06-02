@@ -33,6 +33,12 @@ const programSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    systemKey: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

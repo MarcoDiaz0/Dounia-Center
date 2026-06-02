@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -17,6 +17,7 @@ import Button from "@/components/common/Button";
 import Card, { CardContent } from "@/components/common/Card";
 import { useAssessmentStore } from "@/store/assessmentStore";
 import { useAuthStore } from "@/store/authStore";
+import { userService } from "@/services/userService";
 import { useChildStore } from "../store/childStore";
 
 const categoryInfo = {
@@ -44,7 +45,7 @@ const categoryInfo = {
 
 export default function Assessment() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const {
     questions,
     currentStep,
@@ -59,19 +60,44 @@ export default function Assessment() {
   } = useAssessmentStore();
 
   const { createChild, addAssessment, isLoading } = useChildStore();
+  const [parents, setParents] = useState([]);
+  const [parentsLoading, setParentsLoading] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     dateOfBirth: "",
     gender: "male",
+    parentId: "",
   });
+
+  useEffect(() => {
+    const loadParents = async () => {
+      if (!isAuthenticated || user?.role !== "admin") return;
+
+      try {
+        setParentsLoading(true);
+        const users = await userService.getUsers({
+          role: "parent",
+          limit: 100,
+        });
+        setParents(users);
+      } catch (error) {
+        toast.error("فشل تحميل قائمة أولياء الأمور");
+      } finally {
+        setParentsLoading(false);
+      }
+    };
+
+    loadParents();
+  }, [isAuthenticated, user?.role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const child = await createChild(form);
       if (result) {
-        const toPercent = (score, max) => Math.round(((max - score) / max) * 100);
+        const toPercent = (score, max) =>
+          Math.round(((max - score) / max) * 100);
 
         await addAssessment(child._id, {
           type: "initial",
@@ -100,7 +126,7 @@ export default function Assessment() {
       resetAssessment();
       navigate("/dashboard");
     } catch (err) {
-      toast.error("فشل حفظ ملف الطفل");
+      toast.error(err?.response?.data?.message || "فشل حفظ ملف الطفل");
       console.error(err);
     }
   };
@@ -307,6 +333,32 @@ export default function Assessment() {
                       className="input-base pr-12"
                     />
                   </div>
+
+                  {user?.role === "admin" && (
+                    <select
+                      value={form.parentId}
+                      onChange={(e) =>
+                        setForm({ ...form, parentId: e.target.value })
+                      }
+                      required
+                      className="input-base pr-12"
+                      disabled={parentsLoading}
+                    >
+                      <option value="">
+                        {parentsLoading
+                          ? "جاري تحميل أولياء الأمور..."
+                          : "اختر ولي الأمر"}
+                      </option>
+                      {parents.map((parent) => (
+                        <option
+                          key={parent.id || parent._id}
+                          value={parent.id || parent._id}
+                        >
+                          {parent.fullName} - {parent.email}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
                   {/* Date of Birth */}
                   <input

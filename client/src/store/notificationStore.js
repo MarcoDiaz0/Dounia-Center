@@ -12,6 +12,7 @@ const extractError = (error) => {
 export const useNotificationStore = create((set) => ({
   notifications: [],
   isLoading: false,
+  isSending: false,
   error: null,
 
   getNotifications: async () => {
@@ -24,12 +25,24 @@ export const useNotificationStore = create((set) => ({
     }
   },
 
+  sendNotification: async (payload) => {
+    try {
+      set({ isSending: true, error: null });
+      const { data } = await instance.post("notifications", payload);
+      set({ isSending: false });
+      return data.data.notification;
+    } catch (error) {
+      set({ error: extractError(error), isSending: false });
+      throw error;
+    }
+  },
+
   markAsRead: async (id) => {
     try {
       await instance.patch(`notifications/${id}/read`);
       set((state) => ({
         notifications: state.notifications.map((n) =>
-          n._id === id ? { ...n, isRead: true } : n
+          n._id === id ? { ...n, isRead: true } : n,
         ),
       }));
     } catch (error) {

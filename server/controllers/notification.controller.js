@@ -1,5 +1,42 @@
 import Notification from "../models/Notification.model.js";
 
+export const createNotification = async (req, res) => {
+  try {
+    const {
+      recipientId,
+      message,
+      type = "system",
+      relatedId = null,
+    } = req.body;
+
+    if (!recipientId || !message?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Recipient and message are required",
+      });
+    }
+
+    const notification = await Notification.create({
+      recipient: recipientId,
+      message: message.trim(),
+      type,
+      relatedId,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Notification sent successfully",
+      data: { notification },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to send notification",
+      error: error.message,
+    });
+  }
+};
+
 // Get notifications for user
 export const getNotifications = async (req, res) => {
   try {
@@ -26,7 +63,7 @@ export const markAsRead = async (req, res) => {
     const notification = await Notification.findOneAndUpdate(
       { _id: req.params.id, recipient: req.user.id },
       { isRead: true },
-      { new: true }
+      { new: true },
     );
 
     if (!notification) {
@@ -54,7 +91,7 @@ export const markAllAsRead = async (req, res) => {
   try {
     await Notification.updateMany(
       { recipient: req.user.id, isRead: false },
-      { isRead: true }
+      { isRead: true },
     );
 
     res.json({

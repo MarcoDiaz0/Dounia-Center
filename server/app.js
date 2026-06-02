@@ -16,6 +16,7 @@ import programRoutes from "./routes/program.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import settingRoutes from "./routes/setting.routes.js";
 import sessionRoutes from "./routes/session.routes.js";
+import { ensureSeedPrograms } from "./program.seed.js";
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ if (!MONGODB_URI) {
 }
 
 let cachedConnectionPromise = null;
+let cachedSeedPromise = null;
 
 mongoose.connection.on("disconnected", () => {
   console.log("MongoDB disconnected");
@@ -56,10 +58,6 @@ mongoose.connection.on("error", (error) => {
 });
 
 export const connectToDatabase = async () => {
-  if (mongoose.connection.readyState === 1) {
-    return mongoose.connection;
-  }
-
   if (!cachedConnectionPromise) {
     cachedConnectionPromise = mongoose
       .connect(MONGODB_URI)
@@ -74,7 +72,19 @@ export const connectToDatabase = async () => {
       });
   }
 
-  return cachedConnectionPromise;
+  const connection = await cachedConnectionPromise;
+
+  if (!cachedSeedPromise) {
+    cachedSeedPromise = ensureSeedPrograms().catch((error) => {
+      cachedSeedPromise = null;
+      console.error("Program seed error:", error.message);
+      throw error;
+    });
+  }
+
+  await cachedSeedPromise;
+
+  return connection;
 };
 
 app.use(

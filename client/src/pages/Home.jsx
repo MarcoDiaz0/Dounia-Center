@@ -103,6 +103,7 @@ const features = [
 
 export default function Home() {
   const [services, setServices] = useState([]);
+  const [bacProgram, setBacProgram] = useState(null);
   const { user } = useAuthStore();
   const isAdmin = user?.role === "admin";
 
@@ -110,7 +111,13 @@ export default function Home() {
     const fetchServices = async () => {
       try {
         const data = await programService.getPrograms();
-        setServices(data.slice(0, 4)); // Show first 4
+        const bac = data.find((program) => program.systemKey === "bac_support");
+        setBacProgram(bac || null);
+        setServices(
+          data
+            .filter((program) => program.systemKey !== "bac_support")
+            .slice(0, 4),
+        );
       } catch (error) {
         console.error("Failed to fetch services", error);
       }
@@ -434,37 +441,35 @@ export default function Home() {
       </section>
 
       {/* Bac Support Banner */}
-      <section className="py-12 bg-gradient-to-l from-primary-600 to-primary-700">
-        <div className="container-custom">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-8 h-8" />
+      {bacProgram && (
+        <section className="py-12 bg-gradient-to-l from-primary-600 to-primary-700">
+          <div className="container-custom">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4 text-white">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-1">{bacProgram.name}</h3>
+                  <p className="text-primary-100">{bacProgram.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-1">
-                  دعم تلاميذ الباكالوريا
-                </h3>
-                <p className="text-primary-100">
-                  دعم نفسي وأكاديمي شامل لتلاميذ البكالوريا
-                </p>
-              </div>
+              {!isAdmin && (
+                <Link to="/services">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    icon={ArrowLeft}
+                    iconPosition="end"
+                  >
+                    اكتشف البرنامج
+                  </Button>
+                </Link>
+              )}
             </div>
-            {!isAdmin && (
-              <Link to="/services">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  icon={ArrowLeft}
-                  iconPosition="end"
-                >
-                  اكتشف البرنامج
-                </Button>
-              </Link>
-            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section id="contact" className="section-padding bg-white">
