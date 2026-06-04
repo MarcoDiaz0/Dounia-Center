@@ -13,6 +13,8 @@ import Assessment from "@/pages/Assessment";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import NotFound from "@/pages/NotFound";
+import Privacy from "@/pages/legal/Privacy";
+import Terms from "@/pages/legal/Terms";
 
 // Protected Pages
 import Dashboard from "@/pages/Dashboard";
@@ -58,6 +60,8 @@ export default function AppRouter() {
         <Route path="/services" element={<Services />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/assessment" element={<Assessment />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

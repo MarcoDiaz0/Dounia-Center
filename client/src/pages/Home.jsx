@@ -266,11 +266,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="mt-8">
-                <Link to="/services">
-                  <Button icon={ArrowLeft} iconPosition="end">
-                    اكتشف خدماتنا
-                  </Button>
-                </Link>
+              
               </div>
             </div>
           </div>
@@ -487,11 +483,7 @@ export default function Home() {
                   ابدأ التقييم المجاني
                 </Button>
               </Link>
-              <Link to="/#contact">
-                <Button variant="outline" size="lg">
-                  تواصل معنا
-                </Button>
-              </Link>
+           
             </div>
           </div>
         </div>

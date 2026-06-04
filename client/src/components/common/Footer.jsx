@@ -1,33 +1,51 @@
-import { Link } from 'react-router-dom'
-import { Leaf, Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
+import { Link } from "react-router-dom";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+} from "lucide-react";
+import logoImg from "@/assets/logo.png";
+
+const contactInfo = {
+  locationLabel: "أم البواقي، الجزائر",
+  locationHref:
+    "https://www.google.com/maps/search/?api=1&query=Oum+El+Bouaghi+Algeria",
+  phoneLabel: "00000....",
+  phoneHref: "tel:00000",
+  email: "dounia.center0@gmail.com",
+};
 
 const footerLinks = {
   services: [
-    { name: 'الدعم النفسي', href: '/services' },
-    { name: 'صعوبات التعلم', href: '/services' },
-    { name: 'تحسين القراءة والكتابة', href: '/services' },
-    { name: 'توجيه الأولياء', href: '/services' },
+    { name: "الدعم النفسي", href: "/services" },
+    { name: "صعوبات التعلم", href: "/services" },
+    { name: "تحسين القراءة والكتابة", href: "/services" },
+    { name: "توجيه الأولياء", href: "/services" },
   ],
   resources: [
-    { name: 'المقالات', href: '/resources' },
-    { name: 'الفيديوهات', href: '/resources' },
-    { name: 'التمارين', href: '/resources' },
-    { name: 'الاختبارات', href: '/resources' },
+    { name: "المقالات", href: "/resources?type=article" },
+    { name: "الفيديوهات", href: "/resources?type=video" },
+    { name: "التمارين", href: "/resources?type=activity" },
+    { name: "التوجيه", href: "/resources?type=guide" },
   ],
-  company: [
-    { name: 'من نحن', href: '/#about' },
-    { name: 'فريقنا', href: '/#team' },
-    { name: 'الشهادات', href: '/#testimonials' },
-    { name: 'تواصل معنا', href: '/#contact' },
-  ],
-}
+};
 
 const socialLinks = [
-  { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61590388108868', label: 'Facebook' },
-  { icon: Instagram, href: 'https://www.instagram.com/dounia.innergrowth?igsh=eW12dG95OWYwZTM5', label: 'Instagram' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  // { icon: Youtube, href: '#', label: 'Youtube' },
-]
+  {
+    icon: Facebook,
+    href: "https://www.facebook.com/profile.php?id=61590388108868",
+    label: "Facebook",
+  },
+  {
+    icon: Instagram,
+    href: "https://www.instagram.com/dounia.innergrowth?igsh=eW12dG95OWYwZTM5",
+    label: "Instagram",
+  },
+];
 
 export default function Footer() {
   return (
@@ -38,22 +56,31 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                <Leaf className="w-7 h-7 text-primary-300" />
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center overflow-hidden">
+                <img
+                  src={logoImg}
+                  alt="Dounia Logo"
+                  className="w-10 h-10  object-contain"
+                />
               </div>
               <div>
                 <span className="font-bold text-xl">مركز دنيا</span>
-                <span className="block text-sm text-primary-300">للنمو الداخلي والتعلم المتكامل</span>
+                <span className="block text-sm text-primary-300">
+                  للنمو الداخلي والتعلم المتكامل
+                </span>
               </div>
             </Link>
             <p className="text-primary-200 mb-6 max-w-sm leading-relaxed">
-              نرافقكم نحو نمو نفسي وتعليمي متوازن. نقدم خدمات متخصصة في الدعم النفسي والتربوي للأطفال والعائلات.
+              نرافقكم نحو نمو نفسي وتعليمي متوازن. نقدم خدمات متخصصة في الدعم
+              النفسي والتربوي للأطفال والعائلات.
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
                   className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary-500 transition-colors"
                   aria-label={social.label}
                 >
@@ -101,17 +128,36 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">تواصل معنا</h4>
             <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" />
-                <span className="text-primary-200">الجزائر العاصمة، الجزائر</span>
+              <li>
+                <a
+                  href={contactInfo.locationHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-start gap-3 text-primary-200 hover:text-white transition-colors"
+                >
+                  <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" />
+                  <span>{contactInfo.locationLabel}</span>
+                </a>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                <span className="text-primary-200 direction-ltr">+213 555 123 456</span>
+              <li>
+                <a
+                  href={contactInfo.phoneHref}
+                  className="flex items-center gap-3 text-primary-200 hover:text-white transition-colors"
+                >
+                  <Phone className="w-5 h-5 text-primary-400 flex-shrink-0" />
+                  <span className="direction-ltr">
+                    {contactInfo.phoneLabel}
+                  </span>
+                </a>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                <span className="text-primary-200">contact@dounia-center.dz</span>
+              <li>
+                <a
+                  href={`mailto:${contactInfo.email}`}
+                  className="flex items-center gap-3 text-primary-200 hover:text-white transition-colors"
+                >
+                  <Mail className="w-5 h-5 text-primary-400 flex-shrink-0" />
+                  <span>{contactInfo.email}</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -122,18 +168,25 @@ export default function Footer() {
       <div className="border-t border-primary-800">
         <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-300 text-sm">
-            &copy; {new Date().getFullYear()} مركز دنيا للنمو الداخلي والتعلم المتكامل. جميع الحقوق محفوظة.
+            &copy; {new Date().getFullYear()} مركز دنيا للنمو الداخلي والتعلم
+            المتكامل. جميع الحقوق محفوظة.
           </p>
           <div className="flex gap-6 text-sm">
-            <Link to="/privacy" className="text-primary-300 hover:text-white transition-colors">
+            <Link
+              to="/privacy"
+              className="text-primary-300 hover:text-white transition-colors"
+            >
               سياسة الخصوصية
             </Link>
-            <Link to="/terms" className="text-primary-300 hover:text-white transition-colors">
+            <Link
+              to="/terms"
+              className="text-primary-300 hover:text-white transition-colors"
+            >
               شروط الاستخدام
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

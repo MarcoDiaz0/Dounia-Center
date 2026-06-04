@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react'
-import { X, Upload, FileText, CheckCircle, Shield } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Button from '../common/Button'
-import resourceService from '@/services/resourceService'
-import { programService } from '@/services/programService'
+import { useState, useEffect } from "react";
+import { X, Upload, FileText, CheckCircle, Shield } from "lucide-react";
+import toast from "react-hot-toast";
+import Button from "../common/Button";
+import resourceService from "@/services/resourceService";
+import { programService } from "@/services/programService";
 
 export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState(null)
-  const [programs, setPrograms] = useState([])
-  
-  const [formData, setFormData] = useState({
-    title_ar: '',
-    title_en: '',
-    description_ar: '',
-    description_en: '',
-    type: 'article',
-    category: 'general',
-    mediaUrl: '',
-    mediaPublicId: '',
-    program: '', // New field for premium resources
-  })
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
+  const [programs, setPrograms] = useState([]);
 
-  const [file, setFile] = useState(null)
+  const [formData, setFormData] = useState({
+    title_ar: "",
+    title_en: "",
+    description_ar: "",
+    description_en: "",
+    type: "article",
+    category: "general",
+    mediaUrl: "",
+    mediaPublicId: "",
+    program: "", // New field for premium resources
+  });
+
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,84 +41,97 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
     }
   };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
+    const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile)
+      setFile(selectedFile);
     }
-  }
+  };
 
   const handleUpload = async () => {
-    if (!file) return
+    if (!file) return;
     try {
-      setUploading(true)
-      const data = await resourceService.uploadFile(file)
+      setUploading(true);
+      const data = await resourceService.uploadFile(file);
       setFormData({
         ...formData,
         mediaUrl: data.data.url,
         mediaPublicId: data.data.public_id,
-      })
-      toast.success('تم رفع الملف بنجاح')
-      setUploading(false)
-      setError(null)
+      });
+      toast.success("تم رفع الملف بنجاح");
+      setUploading(false);
+      setError(null);
     } catch (err) {
-      setUploading(false)
-      const msg = err?.response?.data?.message || err?.message || 'فشل رفع الملف'
-      setError(msg)
-      toast.error(`فشل رفع الملف: ${msg}`)
-      console.error(err)
+      setUploading(false);
+      const msg =
+        err?.response?.data?.message || err?.message || "فشل رفع الملف";
+      setError(msg);
+      toast.error(`فشل رفع الملف: ${msg}`);
+      console.error(err);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       const payload = {
         title: { ar: formData.title_ar, en: formData.title_en },
-        description: { 
-          ar: formData.description_ar, 
-          en: formData.description_en || formData.description_ar 
+        description: {
+          ar: formData.description_ar,
+          en: formData.description_en || formData.description_ar,
         },
         type: formData.type,
         category: formData.category,
         mediaUrl: formData.mediaUrl,
         mediaPublicId: formData.mediaPublicId,
         program: formData.program || null,
-      }
+      };
 
-      await resourceService.createResource(payload)
-      setSuccess(true)
-      toast.success('تمت إضافة المصدر بنجاح')
+      await resourceService.createResource(payload);
+      setSuccess(true);
+      toast.success("تمت إضافة المصدر بنجاح");
       setTimeout(() => {
-        onRefresh()
-        onClose()
-        setSuccess(false)
+        onRefresh();
+        onClose();
+        setSuccess(false);
         setFormData({
-          title_ar: '', title_en: '', description_ar: '', description_en: '',
-          type: 'article', category: 'general', mediaUrl: '', mediaPublicId: ''
-        })
-        setFile(null)
-      }, 1500)
+          title_ar: "",
+          title_en: "",
+          description_ar: "",
+          description_en: "",
+          type: "article",
+          category: "general",
+          mediaUrl: "",
+          mediaPublicId: "",
+        });
+        setFile(null);
+      }, 1500);
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.message || 'فشل إضافة المصدر'
-      setError(msg)
-      toast.error(`فشل إضافة المصدر: ${msg}`)
-      console.error(err)
+      const msg =
+        err?.response?.data?.message || err?.message || "فشل إضافة المصدر";
+      setError(msg);
+      toast.error(`فشل إضافة المصدر: ${msg}`);
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="sticky top-0 bg-white p-6 border-b border-secondary-100 flex items-center justify-between z-10">
-          <h2 className="text-2xl font-bold text-primary-800">إضافة مصدر جديد</h2>
-          <button onClick={onClose} className="p-2 hover:bg-secondary-50 rounded-full transition-colors">
+          <h2 className="text-2xl font-bold text-primary-800">
+            إضافة مصدر جديد
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-secondary-50 rounded-full transition-colors"
+          >
             <X className="w-6 h-6 text-primary-400" />
           </button>
         </div>
@@ -129,7 +142,9 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle className="w-12 h-12 text-green-500" />
               </div>
-              <h3 className="text-xl font-bold text-primary-800">تمت الإضافة بنجاح</h3>
+              <h3 className="text-xl font-bold text-primary-800">
+                تمت الإضافة بنجاح
+              </h3>
               <p className="text-primary-600">سيتم تحديث القائمة فوراً</p>
             </div>
           ) : (
@@ -142,72 +157,100 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">العنوان (عربي)</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    العنوان (عربي)
+                  </label>
                   <input
                     required
                     type="text"
                     className="input-base"
                     value={formData.title_ar}
-                    onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title_ar: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">Title (English)</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    Title (English)
+                  </label>
                   <input
                     required
                     type="text"
                     className="input-base"
                     value={formData.title_en}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title_en: e.target.value })
+                    }
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">الوصف (عربي)</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    الوصف (عربي)
+                  </label>
                   <textarea
                     required
                     rows="3"
                     className="input-base"
                     value={formData.description_ar}
-                    onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        description_ar: e.target.value,
+                      })
+                    }
                   ></textarea>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">Description (English)</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    Description (English)
+                  </label>
                   <textarea
                     required
                     rows="3"
                     className="input-base"
                     value={formData.description_en}
-                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        description_en: e.target.value,
+                      })
+                    }
                   ></textarea>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">النوع</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    النوع
+                  </label>
                   <select
                     className="input-base"
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
                   >
                     <option value="article">مقالة</option>
                     <option value="video">فيديو</option>
                     <option value="activity">تمرين</option>
                     <option value="guide">دليل</option>
-                    <option value="worksheet">ورقة عمل</option>
-                    <option value="tool">أداة</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-primary-700 mb-2">الفئة</label>
+                  <label className="block text-sm font-semibold text-primary-700 mb-2">
+                    الفئة
+                  </label>
                   <select
                     className="input-base"
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                   >
                     <option value="general">عام</option>
                     <option value="cognitive">إدراكي</option>
@@ -222,29 +265,36 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
               <div className="p-4 bg-primary-50 rounded-2xl border border-primary-100">
                 <div className="flex items-center gap-2 mb-3">
                   <Shield className="w-5 h-5 text-primary-600" />
-                  <label className="text-sm font-bold text-primary-800">صلاحية الوصول (اختياري)</label>
+                  <label className="text-sm font-bold text-primary-800">
+                    صلاحية الوصول (اختياري)
+                  </label>
                 </div>
                 <select
                   className="input-base bg-white"
                   value={formData.program}
-                  onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, program: e.target.value })
+                  }
                 >
                   <option value="">عام (متاح للجميع)</option>
-                  {programs.map(prog => (
+                  {programs.map((prog) => (
                     <option key={prog._id} value={prog._id}>
                       مخصص لبرنامج: {prog.name}
                     </option>
                   ))}
                 </select>
                 <p className="text-xs text-primary-600 mt-2 pr-1">
-                  إذا اخترت برنامجاً، سيتمكن فقط المشتركون فيه من رؤية هذا المصدر.
+                  إذا اخترت برنامجاً، سيتمكن فقط المشتركون فيه من رؤية هذا
+                  المصدر.
                 </p>
               </div>
 
               {/* File Upload Section */}
               <div className="p-6 bg-secondary-50 rounded-2xl border-2 border-dashed border-secondary-200">
-                <label className="block text-sm font-semibold text-primary-700 mb-4 text-center">رفع ملف (PDF، صورة، أو فيديو)</label>
-                
+                <label className="block text-sm font-semibold text-primary-700 mb-4 text-center">
+                  رفع ملف (PDF، صورة، أو فيديو)
+                </label>
+
                 {!formData.mediaUrl ? (
                   <div className="flex flex-col items-center gap-4">
                     <input
@@ -259,9 +309,11 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
                       className="cursor-pointer flex flex-col items-center gap-2 p-4 bg-white rounded-xl shadow-sm border border-secondary-100 hover:border-primary-300 transition-all"
                     >
                       <Upload className="w-8 h-8 text-primary-400" />
-                      <span className="text-sm text-primary-600">{file ? file.name : 'اختر ملفاً'}</span>
+                      <span className="text-sm text-primary-600">
+                        {file ? file.name : "اختر ملفاً"}
+                      </span>
                     </label>
-                    
+
                     {file && (
                       <Button
                         type="button"
@@ -278,11 +330,19 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
                   <div className="flex items-center justify-between bg-green-50 p-4 rounded-xl border border-green-100">
                     <div className="flex items-center gap-3">
                       <FileText className="w-6 h-6 text-green-500" />
-                      <span className="text-sm text-green-700 font-medium">تم رفع الملف بنجاح</span>
+                      <span className="text-sm text-green-700 font-medium">
+                        تم رفع الملف بنجاح
+                      </span>
                     </div>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, mediaUrl: '', mediaPublicId: '' })}
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          mediaUrl: "",
+                          mediaPublicId: "",
+                        })
+                      }
                       className="text-xs text-red-500 underline"
                     >
                       تغيير
@@ -309,5 +369,5 @@ export default function AddResourceModal({ isOpen, onClose, onRefresh }) {
         </form>
       </div>
     </div>
-  )
+  );
 }

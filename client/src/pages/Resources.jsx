@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Search,
   FileText,
@@ -13,133 +14,167 @@ import {
   Plus,
   Trash2,
   Shield,
-} from 'lucide-react'
-import toast from 'react-hot-toast'
-import Card, { CardContent } from '@/components/common/Card'
-import SectionTitle from '@/components/common/SectionTitle'
-import Button from '@/components/common/Button'
-import resourceService from '@/services/resourceService'
-import { useAuthStore } from '@/store/authStore'
-import AddResourceModal from '@/components/resources/AddResourceModal'
+} from "lucide-react";
+import toast from "react-hot-toast";
+import Card, { CardContent } from "@/components/common/Card";
+import SectionTitle from "@/components/common/SectionTitle";
+import Button from "@/components/common/Button";
+import resourceService from "@/services/resourceService";
+import { useAuthStore } from "@/store/authStore";
+import AddResourceModal from "@/components/resources/AddResourceModal";
 
 const categories = [
-  { id: 'all', name: 'الكل', icon: BookOpen },
-  { id: 'article', name: 'المقالات', icon: FileText },
-  { id: 'video', name: 'الفيديوهات', icon: Video },
-  { id: 'activity', name: 'التمارين', icon: ClipboardList },
-  { id: 'guide', name: 'الأدلة', icon: BookOpen },
-  { id: 'worksheet', name: 'أوراق العمل', icon: FileText },
-  { id: 'tool', name: 'الأدوات', icon: ClipboardList },
-]
+  { id: "all", name: "الكل", icon: BookOpen },
+  { id: "article", name: "المقالات", icon: FileText },
+  { id: "video", name: "الفيديوهات", icon: Video },
+  { id: "activity", name: "التمارين", icon: ClipboardList },
+  { id: "guide", name: "التوجيه", icon: BookOpen },
+];
 
 const typeIcons = {
   article: FileText,
   video: Video,
   activity: ClipboardList,
   guide: BookOpen,
-  worksheet: FileText,
-  tool: ClipboardList,
   pdfs: FileText, // Fallback for legacy
-}
+};
 
 const typeColors = {
-  article: 'bg-blue-100 text-blue-600',
-  video: 'bg-rose-100 text-rose-600',
-  activity: 'bg-amber-100 text-amber-600',
-  guide: 'bg-teal-100 text-teal-600',
-  worksheet: 'bg-purple-100 text-purple-600',
-  tool: 'bg-emerald-100 text-emerald-600',
-}
+  article: "bg-blue-100 text-blue-600",
+  video: "bg-rose-100 text-rose-600",
+  activity: "bg-amber-100 text-amber-600",
+  guide: "bg-teal-100 text-teal-600",
+};
 
 export default function Resources() {
-  const { user } = useAuthStore()
-  const [resources, setResources] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [showMobileFilters, setShowMobileFilters] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { user } = useAuthStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
-    fetchResources()
-  }, [selectedCategory])
+    const typeFromQuery = searchParams.get("type");
+    const hasMatchingCategory = categories.some(
+      (category) => category.id === typeFromQuery,
+    );
+
+    if (
+      typeFromQuery &&
+      hasMatchingCategory &&
+      typeFromQuery !== selectedCategory
+    ) {
+      setSelectedCategory(typeFromQuery);
+      return;
+    }
+
+    if (!typeFromQuery && selectedCategory !== "all") {
+      setSelectedCategory("all");
+      return;
+    }
+
+    fetchResources();
+  }, [selectedCategory, searchParams]);
 
   const fetchResources = async () => {
     try {
-      setLoading(true)
-      const params = {}
-      if (selectedCategory !== 'all') {
-        params.type = selectedCategory
+      setLoading(true);
+      const params = {};
+      if (selectedCategory !== "all") {
+        params.type = selectedCategory;
       }
-      const response = await resourceService.getResources(params)
-      setResources(response.data.resources)
-      setError(null)
+      const response = await resourceService.getResources(params);
+      setResources(response.data.resources);
+      setError(null);
     } catch (err) {
-      setError('Failed to fetch resources')
-      console.error(err)
+      setError("Failed to fetch resources");
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const filteredResources = resources.filter((resource) => {
-    const title = resource.title?.ar || resource.title?.en || resource.title || ''
-    const description = resource.description?.ar || resource.description?.en || resource.description || ''
-    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         description.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesSearch
-  })
+    const title =
+      resource.title?.ar || resource.title?.en || resource.title || "";
+    const description =
+      resource.description?.ar ||
+      resource.description?.en ||
+      resource.description ||
+      "";
+    const matchesSearch =
+      title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  });
 
-  const featuredResources = resources.filter((r) => r.isFeatured)
+  const featuredResources = resources.filter((r) => r.isFeatured);
 
   const ResourceCard = ({ resource }) => {
-    const Icon = typeIcons[resource.type] || BookOpen
-    const colorClass = typeColors[resource.type] || 'bg-gray-100 text-gray-600'
-    const title = resource.title?.ar || resource.title?.en || resource.title
-    const description = resource.description?.ar || resource.description?.en || resource.description
+    const Icon = typeIcons[resource.type] || BookOpen;
+    const colorClass = typeColors[resource.type] || "bg-gray-100 text-gray-600";
+    const title = resource.title?.ar || resource.title?.en || resource.title;
+    const description =
+      resource.description?.ar ||
+      resource.description?.en ||
+      resource.description;
 
     const handleDelete = async (id) => {
-      if (window.confirm('هل أنت متأكد من حذف هذا المصدر؟ سيتم حذفه من القاعدة ومن كلاوديناري أيضاً.')) {
+      if (
+        window.confirm(
+          "هل أنت متأكد من حذف هذا المصدر؟ سيتم حذفه من القاعدة ومن كلاوديناري أيضاً.",
+        )
+      ) {
         try {
-          await resourceService.deleteResource(id)
-          fetchResources()
-          toast.success('تم حذف المصدر بنجاح')
+          await resourceService.deleteResource(id);
+          fetchResources();
+          toast.success("تم حذف المصدر بنجاح");
         } catch (err) {
-          toast.error('فشل حذف المصدر')
-          console.error(err)
+          toast.error("فشل حذف المصدر");
+          console.error(err);
         }
       }
-    }
+    };
 
     return (
       <Card hover className="h-full flex flex-col">
         <CardContent className="flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
-            <div className={`w-12 h-12 rounded-xl ${colorClass} flex items-center justify-center flex-shrink-0`}>
+            <div
+              className={`w-12 h-12 rounded-xl ${colorClass} flex items-center justify-center flex-shrink-0`}
+            >
               <Icon className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${colorClass}`}>
-                  {categories.find((c) => c.id === resource.type)?.name || resource.type}
+                <span
+                  className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${colorClass}`}
+                >
+                  {categories.find((c) => c.id === resource.type)?.name ||
+                    resource.type}
                 </span>
                 {resource.program && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-amber-100 text-amber-700">
                     <Shield className="w-3 h-3" />
-                    {resource.program.name || 'برنامج خاص'}
+                    {resource.program.name || "برنامج خاص"}
                   </span>
                 )}
               </div>
               <div className="flex items-center justify-between gap-2">
-                <h3 className="font-semibold text-primary-800 line-clamp-2">{title}</h3>
+                <h3 className="font-semibold text-primary-800 line-clamp-2">
+                  {title}
+                </h3>
                 {isAdmin && (
-                  <button 
+                  <button
                     onClick={(e) => {
-                      e.stopPropagation()
-                      handleDelete(resource._id)
+                      e.stopPropagation();
+                      handleDelete(resource._id);
                     }}
                     className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="حذف"
@@ -151,23 +186,27 @@ export default function Resources() {
             </div>
           </div>
 
-          <p className="text-sm text-primary-600 mb-4 flex-1 line-clamp-2">{description}</p>
+          <p className="text-sm text-primary-600 mb-4 flex-1 line-clamp-2">
+            {description}
+          </p>
 
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-secondary-100">
             <div className="flex items-center gap-2 text-sm text-primary-500">
               <Clock className="w-4 h-4" />
               <span>
-                {resource.duration ? `${resource.duration} دقيقة` : 'مصدر تعليمي'}
+                {resource.duration
+                  ? `${resource.duration} دقيقة`
+                  : "مصدر تعليمي"}
               </span>
             </div>
             <div className="flex gap-2">
               {resource.mediaUrl && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  onClick={() => window.open(resource.mediaUrl, '_blank')}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => window.open(resource.mediaUrl, "_blank")}
                 >
-                  {resource.type === 'video' ? (
+                  {resource.type === "video" ? (
                     <>
                       <Play className="w-4 h-4" />
                       شاهد
@@ -184,8 +223,8 @@ export default function Resources() {
           </div>
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen">
@@ -197,7 +236,8 @@ export default function Resources() {
               مكتبة المصادر
             </h1>
             <p className="text-lg text-primary-600 leading-relaxed mb-8">
-              موارد تعليمية متنوعة للأهل والمعلمين لدعم الأطفال في رحلتهم التعليمية
+              موارد تعليمية متنوعة للأهل والمعلمين لدعم الأطفال في رحلتهم
+              التعليمية
             </p>
 
             {/* Search and Add */}
@@ -213,7 +253,7 @@ export default function Resources() {
                 />
               </div>
               {isAdmin && (
-                <Button 
+                <Button
                   className="flex items-center gap-2 whitespace-nowrap"
                   onClick={() => setIsModalOpen(true)}
                 >
@@ -227,22 +267,25 @@ export default function Resources() {
       </section>
 
       {/* Featured Resources */}
-      {!loading && featuredResources.length > 0 && searchQuery === '' && selectedCategory === 'all' && (
-        <section className="py-12 bg-white">
-          <div className="container-custom">
-            <SectionTitle
-              title="مصادر مميزة"
-              subtitle="أحدث وأهم المصادر المختارة لكم"
-              align="right"
-            />
-            <div className="grid md:grid-cols-2 gap-6">
-              {featuredResources.map((resource) => (
-                <ResourceCard key={resource._id} resource={resource} />
-              ))}
+      {!loading &&
+        featuredResources.length > 0 &&
+        searchQuery === "" &&
+        selectedCategory === "all" && (
+          <section className="py-12 bg-white">
+            <div className="container-custom">
+              <SectionTitle
+                title="مصادر مميزة"
+                subtitle="أحدث وأهم المصادر المختارة لكم"
+                align="right"
+              />
+              <div className="grid md:grid-cols-2 gap-6">
+                {featuredResources.map((resource) => (
+                  <ResourceCard key={resource._id} resource={resource} />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
       {/* Main Content */}
       <section className="section-padding bg-cream">
@@ -254,24 +297,35 @@ export default function Resources() {
                 onClick={() => setShowMobileFilters(!showMobileFilters)}
                 className="lg:hidden w-full flex items-center justify-between p-4 bg-white rounded-xl shadow-soft mb-4"
               >
-                <span className="font-medium text-primary-800">تصفية حسب النوع</span>
+                <span className="font-medium text-primary-800">
+                  تصفية حسب النوع
+                </span>
                 <Filter className="w-5 h-5 text-primary-600" />
               </button>
 
-              <div className={`bg-white rounded-2xl shadow-soft p-4 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
-                <h3 className="font-semibold text-primary-800 mb-4">تصفية حسب النوع</h3>
+              <div
+                className={`bg-white rounded-2xl shadow-soft p-4 ${showMobileFilters ? "block" : "hidden lg:block"}`}
+              >
+                <h3 className="font-semibold text-primary-800 mb-4">
+                  تصفية حسب النوع
+                </h3>
                 <ul className="space-y-2">
                   {categories.map((category) => (
                     <li key={category.id}>
                       <button
                         onClick={() => {
-                          setSelectedCategory(category.id)
-                          setShowMobileFilters(false)
+                          setSelectedCategory(category.id);
+                          setShowMobileFilters(false);
+                          if (category.id === "all") {
+                            setSearchParams({});
+                          } else {
+                            setSearchParams({ type: category.id });
+                          }
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                           selectedCategory === category.id
-                            ? 'bg-primary-500 text-white'
-                            : 'text-primary-700 hover:bg-primary-50'
+                            ? "bg-primary-500 text-white"
+                            : "text-primary-700 hover:bg-primary-50"
                         }`}
                       >
                         <category.icon className="w-5 h-5" />
@@ -297,13 +351,17 @@ export default function Resources() {
                 <>
                   <div className="flex items-center justify-between mb-6">
                     <p className="text-primary-600">
-                      <span className="font-semibold text-primary-800">{filteredResources.length}</span> نتيجة
+                      <span className="font-semibold text-primary-800">
+                        {filteredResources.length}
+                      </span>{" "}
+                      نتيجة
                     </p>
-                    {(searchQuery || selectedCategory !== 'all') && (
+                    {(searchQuery || selectedCategory !== "all") && (
                       <button
                         onClick={() => {
-                          setSearchQuery('')
-                          setSelectedCategory('all')
+                          setSearchQuery("");
+                          setSelectedCategory("all");
+                          setSearchParams({});
                         }}
                         className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
                       >
@@ -322,8 +380,12 @@ export default function Resources() {
                   ) : (
                     <div className="text-center py-16 bg-white rounded-2xl">
                       <Search className="w-16 h-16 text-primary-200 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-primary-800 mb-2">لا توجد نتائج</h3>
-                      <p className="text-primary-600">جرب البحث بكلمات مختلفة أو تغيير الفلاتر</p>
+                      <h3 className="text-xl font-semibold text-primary-800 mb-2">
+                        لا توجد نتائج
+                      </h3>
+                      <p className="text-primary-600">
+                        جرب البحث بكلمات مختلفة أو تغيير الفلاتر
+                      </p>
                     </div>
                   )}
                 </>
@@ -333,11 +395,11 @@ export default function Resources() {
         </div>
       </section>
 
-      <AddResourceModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <AddResourceModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         onRefresh={fetchResources}
       />
     </div>
-  )
+  );
 }

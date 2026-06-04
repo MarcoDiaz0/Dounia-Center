@@ -1,49 +1,51 @@
-import Resource from '../models/Resource.model.js';
-import Child from '../models/Child.model.js';
-import { v2 as cloudinary } from 'cloudinary';
+import Resource from "../models/Resource.model.js";
+import Child from "../models/Child.model.js";
+import { v2 as cloudinary } from "cloudinary";
+
+const removedResourceTypes = ["worksheet", "tool"];
 
 // Get all resources
 export const getResources = async (req, res) => {
   try {
-    const { 
-      type, 
-      category, 
-      ageMin, 
-      ageMax, 
+    const {
+      type,
+      category,
+      ageMin,
+      ageMax,
       search,
       featured,
       program,
-      page = 1, 
-      limit = 12 
+      page = 1,
+      limit = 12,
     } = req.query;
 
-    let query = { isPublished: true };
-    
+    let query = { isPublished: true, type: { $nin: removedResourceTypes } };
+
     // For non-admins, restrict access to premium resources
-    if (req.user && req.user.role !== 'admin') {
-      const children = await Child.find({ parent: req.user.id, isActive: true });
+    if (req.user && req.user.role !== "admin") {
+      const children = await Child.find({
+        parent: req.user.id,
+        isActive: true,
+      });
       const enrolledPrograms = children.reduce((acc, child) => {
-        return [...acc, ...child.enrolledPrograms.map(p => p.toString())];
+        return [...acc, ...child.enrolledPrograms.map((p) => p.toString())];
       }, []);
 
       // Filter: Public resources OR resources for enrolled programs
       query = {
         ...query,
-        $or: [
-          { program: null },
-          { program: { $in: enrolledPrograms } }
-        ]
+        $or: [{ program: null }, { program: { $in: enrolledPrograms } }],
       };
     }
 
     if (type) query.type = type;
     if (category) query.category = category;
-    if (featured === 'true') query.isFeatured = true;
+    if (featured === "true") query.isFeatured = true;
     if (program) query.program = program;
-    
+
     if (ageMin || ageMax) {
-      query['ageRange.min'] = { $lte: parseInt(ageMax) || 18 };
-      query['ageRange.max'] = { $gte: parseInt(ageMin) || 0 };
+      query["ageRange.min"] = { $lte: parseInt(ageMax) || 18 };
+      query["ageRange.max"] = { $gte: parseInt(ageMin) || 0 };
     }
 
     if (search) {
@@ -51,7 +53,7 @@ export const getResources = async (req, res) => {
     }
 
     const resources = await Resource.find(query)
-      .populate('program', 'name')
+      .populate("program", "name")
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .sort({ isFeatured: -1, createdAt: -1 });
@@ -66,15 +68,15 @@ export const getResources = async (req, res) => {
           page: parseInt(page),
           limit: parseInt(limit),
           total,
-          pages: Math.ceil(total / limit)
-        }
-      }
+          pages: Math.ceil(total / limit),
+        },
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch resources',
-      error: error.message
+      message: "Failed to fetch resources",
+      error: error.message,
     });
   }
 };
@@ -84,24 +86,32 @@ export const getResourceById = async (req, res) => {
   try {
     const resource = await Resource.findById(req.params.id);
 
-    if (!resource || !resource.isPublished) {
+    if (
+      !resource ||
+      !resource.isPublished ||
+      removedResourceTypes.includes(resource.type)
+    ) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: "Resource not found",
       });
     }
 
     // Check permissions for premium resources
-    if (resource.program && req.user && req.user.role !== 'admin') {
-      const children = await Child.find({ parent: req.user.id, isActive: true });
+    if (resource.program && req.user && req.user.role !== "admin") {
+      const children = await Child.find({
+        parent: req.user.id,
+        isActive: true,
+      });
       const enrolledPrograms = children.reduce((acc, child) => {
-        return [...acc, ...child.enrolledPrograms.map(p => p.toString())];
+        return [...acc, ...child.enrolledPrograms.map((p) => p.toString())];
       }, []);
 
       if (!enrolledPrograms.includes(resource.program.toString())) {
         return res.status(403).json({
           success: false,
-          message: 'Access denied. You must be enrolled in the required program to access this resource.'
+          message:
+            "Access denied. You must be enrolled in the required program to access this resource.",
         });
       }
     }
@@ -112,13 +122,13 @@ export const getResourceById = async (req, res) => {
 
     res.json({
       success: true,
-      data: { resource }
+      data: { resource },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch resource',
-      error: error.message
+      message: "Failed to fetch resource",
+      error: error.message,
     });
   }
 };
@@ -128,20 +138,21 @@ export const getFeaturedResources = async (req, res) => {
   try {
     const resources = await Resource.find({
       isPublished: true,
-      isFeatured: true
+      isFeatured: true,
+      type: { $nin: removedResourceTypes },
     })
       .limit(6)
       .sort({ createdAt: -1 });
 
     res.json({
       success: true,
-      data: { resources }
+      data: { resources },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch featured resources',
-      error: error.message
+      message: "Failed to fetch featured resources",
+      error: error.message,
     });
   }
 };
@@ -154,7 +165,8 @@ export const getResourcesByCategory = async (req, res) => {
 
     const resources = await Resource.find({
       isPublished: true,
-      category
+      category,
+      type: { $nin: removedResourceTypes },
     })
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
@@ -162,7 +174,8 @@ export const getResourcesByCategory = async (req, res) => {
 
     const total = await Resource.countDocuments({
       isPublished: true,
-      category
+      category,
+      type: { $nin: removedResourceTypes },
     });
 
     res.json({
@@ -173,15 +186,15 @@ export const getResourcesByCategory = async (req, res) => {
           page: parseInt(page),
           limit: parseInt(limit),
           total,
-          pages: Math.ceil(total / limit)
-        }
-      }
+          pages: Math.ceil(total / limit),
+        },
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch resources',
-      error: error.message
+      message: "Failed to fetch resources",
+      error: error.message,
     });
   }
 };
@@ -191,28 +204,28 @@ export const createResource = async (req, res) => {
   try {
     const resourceData = {
       ...req.body,
-      author: req.user.id
+      author: req.user.id,
     };
 
     const resource = await Resource.create(resourceData);
 
     res.status(201).json({
       success: true,
-      message: 'Resource created successfully',
-      data: { resource }
+      message: "Resource created successfully",
+      data: { resource },
     });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
         success: false,
-        message: messages.join(', ')
+        message: messages.join(", "),
       });
     }
     res.status(500).json({
       success: false,
-      message: 'Failed to create resource',
-      error: error.message
+      message: "Failed to create resource",
+      error: error.message,
     });
   }
 };
@@ -221,42 +234,54 @@ export const createResource = async (req, res) => {
 export const updateResource = async (req, res) => {
   try {
     const oldResource = await Resource.findById(req.params.id);
-    
+
     if (!oldResource) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: "Resource not found",
       });
     }
 
     // If new media is provided, delete the old one from Cloudinary
-    if (req.body.mediaPublicId && oldResource.mediaPublicId && req.body.mediaPublicId !== oldResource.mediaPublicId) {
-      let resourceType = 'image';
-      const url = oldResource.mediaUrl || '';
-      if (url.endsWith('.pdf')) {
-        resourceType = 'raw';
-      } else if (oldResource.type === 'video' || url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi') || url.endsWith('.mkv') || url.endsWith('.webm')) {
-        resourceType = 'video';
+    if (
+      req.body.mediaPublicId &&
+      oldResource.mediaPublicId &&
+      req.body.mediaPublicId !== oldResource.mediaPublicId
+    ) {
+      let resourceType = "image";
+      const url = oldResource.mediaUrl || "";
+      if (url.endsWith(".pdf")) {
+        resourceType = "raw";
+      } else if (
+        oldResource.type === "video" ||
+        url.endsWith(".mp4") ||
+        url.endsWith(".mov") ||
+        url.endsWith(".avi") ||
+        url.endsWith(".mkv") ||
+        url.endsWith(".webm")
+      ) {
+        resourceType = "video";
       }
-      await cloudinary.uploader.destroy(oldResource.mediaPublicId, { resource_type: resourceType });
+      await cloudinary.uploader.destroy(oldResource.mediaPublicId, {
+        resource_type: resourceType,
+      });
     }
 
-    const resource = await Resource.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const resource = await Resource.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.json({
       success: true,
-      message: 'Resource updated successfully',
-      data: { resource }
+      message: "Resource updated successfully",
+      data: { resource },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to update resource',
-      error: error.message
+      message: "Failed to update resource",
+      error: error.message,
     });
   }
 };
@@ -269,33 +294,42 @@ export const deleteResource = async (req, res) => {
     if (!resource) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: "Resource not found",
       });
     }
 
     // Delete from Cloudinary if exists
     if (resource.mediaPublicId) {
-      let resourceType = 'image';
-      const url = resource.mediaUrl || '';
-      if (url.endsWith('.pdf')) {
-        resourceType = 'raw';
-      } else if (resource.type === 'video' || url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi') || url.endsWith('.mkv') || url.endsWith('.webm')) {
-        resourceType = 'video';
+      let resourceType = "image";
+      const url = resource.mediaUrl || "";
+      if (url.endsWith(".pdf")) {
+        resourceType = "raw";
+      } else if (
+        resource.type === "video" ||
+        url.endsWith(".mp4") ||
+        url.endsWith(".mov") ||
+        url.endsWith(".avi") ||
+        url.endsWith(".mkv") ||
+        url.endsWith(".webm")
+      ) {
+        resourceType = "video";
       }
-      await cloudinary.uploader.destroy(resource.mediaPublicId, { resource_type: resourceType });
+      await cloudinary.uploader.destroy(resource.mediaPublicId, {
+        resource_type: resourceType,
+      });
     }
 
     await Resource.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
-      message: 'Resource deleted successfully'
+      message: "Resource deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to delete resource',
-      error: error.message
+      message: "Failed to delete resource",
+      error: error.message,
     });
   }
 };
@@ -306,25 +340,25 @@ export const likeResource = async (req, res) => {
     const resource = await Resource.findByIdAndUpdate(
       req.params.id,
       { $inc: { likes: 1 } },
-      { new: true }
+      { new: true },
     );
 
     if (!resource) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: "Resource not found",
       });
     }
 
     res.json({
       success: true,
-      data: { likes: resource.likes }
+      data: { likes: resource.likes },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to like resource',
-      error: error.message
+      message: "Failed to like resource",
+      error: error.message,
     });
   }
 };
