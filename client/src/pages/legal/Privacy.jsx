@@ -5,7 +5,7 @@ export default function Privacy() {
         <div className="bg-white rounded-3xl shadow-soft p-8 md:p-12 space-y-6">
           <h1 className="text-3xl font-bold text-primary-800">سياسة الخصوصية</h1>
           <p className="text-primary-600 leading-relaxed">
-            يلتزم مركز دنيا بحماية خصوصية المستخدمين والبيانات الشخصية التي يتم
+            يلتزم دنيا بحماية خصوصية المستخدمين والبيانات الشخصية التي يتم
             جمعها من خلال الموقع والخدمات الرقمية.
           </p>
           <section className="space-y-3 text-primary-700 leading-relaxed">

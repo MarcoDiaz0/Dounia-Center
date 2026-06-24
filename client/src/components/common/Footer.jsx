@@ -64,7 +64,7 @@ export default function Footer() {
                 />
               </div>
               <div>
-                <span className="font-bold text-xl">مركز دنيا</span>
+                <span className="font-bold text-xl"> دنيا</span>
                 <span className="block text-sm text-primary-300">
                   للنمو الداخلي والتعلم المتكامل
                 </span>
@@ -168,7 +168,7 @@ export default function Footer() {
       <div className="border-t border-primary-800">
         <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-300 text-sm">
-            &copy; {new Date().getFullYear()} مركز دنيا للنمو الداخلي والتعلم
+            &copy; {new Date().getFullYear()}  دنيا للنمو الداخلي والتعلم
             المتكامل. جميع الحقوق محفوظة.
           </p>
           <div className="flex gap-6 text-sm">

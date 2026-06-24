@@ -95,7 +95,7 @@ export default function DashboardLayout() {
                   className="w-10 h-10 object-contain"
                 />
                 <div>
-                  <span className="font-bold text-primary-800">مركز دنيا</span>
+                  <span className="font-bold text-primary-800"> دنيا</span>
                   <span className="block text-xs text-primary-600">لوحة التحكم</span>
                 </div>
               </Link>

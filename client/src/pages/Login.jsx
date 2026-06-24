@@ -17,7 +17,7 @@ export default function Login() {
             />
             <div>
               <span className="font-bold text-xl text-primary-800">
-                مركز دنيا
+                 دنيا
               </span>
               <span className="block text-sm text-primary-600">
                 للنمو الداخلي والتعلم المتكامل

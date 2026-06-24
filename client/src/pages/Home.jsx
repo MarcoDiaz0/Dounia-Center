@@ -143,7 +143,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-900 leading-tight mb-6">
-                مركز دنيا
+                 دنيا
                 <span className="block text-primary-600">
                   للنمو الداخلي والتعلم المتكامل
                 </span>
@@ -251,7 +251,7 @@ export default function Home() {
               />
               <div className="space-y-4 text-primary-700 leading-relaxed">
                 <p>
-                  مركز دنيا للنمو الداخلي والتعلم هو مؤسسة رائدة تقدم خدمات
+                   دنيا للنمو الداخلي والتعلم هو مؤسسة رائدة تقدم خدمات
                   نفسية وتربوية عالية الجودة للأطفال والعائلات في الجزائر.
                 </p>
                 <p>
@@ -366,7 +366,7 @@ export default function Home() {
       <section className="section-padding bg-primary-900 text-white">
         <div className="container-custom">
           <SectionTitle
-            title="لماذا تختار مركز دنيا؟"
+            title="لماذا تختار دنيا؟"
             subtitle="نحن ملتزمون بتقديم أفضل دعم لطفلك وعائلتك"
             className="text-white [&_h2]:text-white [&_p]:text-primary-200 [&_div]:bg-primary-400"
           />

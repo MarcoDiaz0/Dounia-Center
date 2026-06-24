@@ -6,7 +6,7 @@ export default function Terms() {
           <h1 className="text-3xl font-bold text-primary-800">شروط الاستخدام</h1>
           <p className="text-primary-600 leading-relaxed">
             باستخدام هذا الموقع، فإنك توافق على الالتزام بهذه الشروط عند تصفح
-            المنصة أو استخدام خدمات مركز دنيا.
+            المنصة أو استخدام خدمات دنيا.
           </p>
           <section className="space-y-3 text-primary-700 leading-relaxed">
             <h2 className="text-xl font-semibold text-primary-800">الاستخدام المقبول</h2>
