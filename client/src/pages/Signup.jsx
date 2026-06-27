@@ -25,7 +25,7 @@ export default function Signup() {
               className="w-12 h-12 object-contain"
             />
             <div>
-              <span className="font-bold text-xl text-primary-800">مركز دنيا</span>
+              <span className="font-bold text-xl text-primary-800">منصة دنيا</span>
               <span className="block text-sm text-primary-600">للنمو الداخلي والتعلم المتكامل</span>
             </div>
           </Link>

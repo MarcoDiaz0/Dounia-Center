@@ -58,14 +58,14 @@ const testimonials = [
     name: "سارة بن علي",
     role: "أم لطفل يبلغ 7 سنوات",
     content:
-      "مركز دنيا غير حياة ابني بشكل كامل. الفريق محترف ومتفهم، وابني الآن يحب القراءة والمدرسة.",
+      "منصة دنيا غيرت حياة ابني بشكل كامل. الفريق محترف ومتفهم، وابني الآن يحب القراءة و المدرسة.",
     rating: 5,
   },
   {
     name: "أحمد مرابط",
     role: "أب لطفلين",
     content:
-      "أنصح كل الأهالي بهذا المركز. البرنامج كان فعالاً جداً وساعد ابنتي على تجاوز صعوبات التركيز.",
+      "أنصح كل الأهالي بهذه المنصة . البرنامج كان فعالاً جداً وساعد ابنتي على تجاوز صعوبات التركيز.",
     rating: 5,
   },
   {
@@ -139,11 +139,11 @@ export default function Home() {
             <div className="text-center lg:text-right animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-medium mb-6">
                 <Sparkles className="w-4 h-4" />
-                <span>مركز متكامل في الدعم النفسي والتربوي</span>
+                <span>منصة متكاملة في الدعم النفسي والتربوي</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-900 leading-tight mb-6">
-                 دنيا
+                دنيا
                 <span className="block text-primary-600">
                   للنمو الداخلي والتعلم المتكامل
                 </span>
@@ -246,17 +246,17 @@ export default function Home() {
             <div className="order-1 lg:order-2">
               <SectionTitle
                 title="من نحن"
-                subtitle="مركز متكامل في تقديم الدعم النفسي والتربوي للأطفال والعائلات"
+                subtitle="منصة متكاملة في تقديم الدعم النفسي والتربوي للأطفال والعائلات"
                 align="right"
               />
               <div className="space-y-4 text-primary-700 leading-relaxed">
                 <p>
-                   دنيا للنمو الداخلي والتعلم هو مؤسسة رائدة تقدم خدمات
-                  نفسية وتربوية عالية الجودة للأطفال والعائلات في الجزائر.
+                  دنيا للنمو الداخلي والتعلم هو مؤسسة رائدة تقدم خدمات نفسية
+                  وتربوية عالية الجودة للأطفال والعائلات في الجزائر.
                 </p>
                 <p>
                   نؤمن بأن كل طفل فريد من نوعه ويستحق الدعم المناسب لتحقيق
-                  إمكاناته الكاملة. يعمل مركزنا جنباً إلى جنب مع العائلات لتوفير
+                  إمكاناته الكاملة. تعمل منصتنا جنباً إلى جنب مع العائلات لتوفير
                   بيئة داعمة ومحفزة.
                 </p>
                 <p>
@@ -265,9 +265,7 @@ export default function Home() {
                   حالة.
                 </p>
               </div>
-              <div className="mt-8">
-              
-              </div>
+              <div className="mt-8"></div>
             </div>
           </div>
         </div>
@@ -483,7 +481,6 @@ export default function Home() {
                   ابدأ التقييم المجاني
                 </Button>
               </Link>
-           
             </div>
           </div>
         </div>

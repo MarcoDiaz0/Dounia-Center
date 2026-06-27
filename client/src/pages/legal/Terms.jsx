@@ -26,7 +26,7 @@ export default function Terms() {
             <h2 className="text-xl font-semibold text-primary-800">المحتوى والمواد</h2>
             <p>
               المواد التعليمية والإرشادية المتاحة على المنصة مخصصة للاستخدام ضمن
-              إطار خدمات المركز، ولا يجوز إعادة نشرها أو استغلالها دون إذن.
+              إطار خدمات المنصة ، ولا يجوز إعادة نشرها أو استغلالها دون إذن.
             </p>
           </section>
           <section className="space-y-3 text-primary-700 leading-relaxed">

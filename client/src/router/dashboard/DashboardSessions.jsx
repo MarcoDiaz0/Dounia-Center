@@ -483,7 +483,7 @@ export default function DashboardSessions() {
                     <label className="text-xs font-semibold text-primary-750">مكان الحصة أو رابط اللقاء:</label>
                     <input
                       type="text"
-                      placeholder="مثال: رابط زووم، أو في مقر المركز بالبليدة"
+                      placeholder="مثال: رابط زووم، أو في المقر بالبليدة"
                       value={respondWhere}
                       onChange={(e) => setRespondWhere(e.target.value)}
                       className="input-base"
